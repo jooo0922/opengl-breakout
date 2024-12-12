@@ -52,6 +52,7 @@ add_executable(${TARGET_NAME}
   ${SRC_DIR}/glad.c
 
   # current src
+  ${SRC_DIR}/game/game.cpp
 
   # current main
   ${SRC_DIR}/main.cpp
