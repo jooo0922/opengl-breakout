@@ -3,7 +3,7 @@
 
 #include <glad/glad.h> // OpenGL 함수를 초기화하기 위한 헤더
 
-class Texture
+class Texture2D
 {
 public:
   // 생성된 텍스쳐 객체 ID
@@ -23,7 +23,7 @@ public:
   unsigned int Filter_Min;
   unsigned int Filter_Max;
 
-  Texture();
+  Texture2D();
 
   // 생성된 텍스쳐 객체에 메모리 할당 및 이미지 데이터 write
   void Generate(unsigned int width, unsigned int height, unsigned char *data);
