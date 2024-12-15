@@ -58,6 +58,9 @@ int main()
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+  // Game 클래스 초기화 수행
+  Breakout.Init();
+
   // delta time 계산을 위한 변수 초기화
   float deltaTime = 0.0f;
   float lastFrame = 0.0f;
@@ -73,9 +76,18 @@ int main()
     // 키보드, 마우스 입력 이벤트 발생 검사 후 등록된 콜백함수 호출 + 이벤트 발생에 따른 GLFWwindow 상태 업데이트
     glfwPollEvents();
 
+    // Game 클래스 사용자 입력 처리 수행 (렌더링 이전 수행)
+    Breakout.ProcessInput(deltaTime);
+
+    // Game 클래스 업데이트 수행 (렌더링 이전 수행)
+    Breakout.Update(deltaTime);
+
     // 버퍼 초기화
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    // Game 클래스 실제 렌더링 수행
+    Breakout.Render();
 
     // Back 버퍼에 렌더링된 최종 이미지를 Front 버퍼에 교체 -> blinking 현상 방지
     glfwSwapBuffers(window);
