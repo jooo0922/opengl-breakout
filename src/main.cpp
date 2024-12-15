@@ -22,6 +22,45 @@ Game Breakout(SCREEN_WIDTH, SCREEN_HEIGHT);
 
 int main()
 {
+  // GLFW 초기화 및 윈도우 설정 구성
+  glfwInit();
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+  // 현재 운영체제가 macos 일 경우, 미래 버전의 OpenGL 을 사용해서 GLFW 창을 생성하여 버전 호환성 이슈 해결
+#ifdef __APPLE__
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
+
+  // GLFW 윈도우 크기 조정 비활성화
+  glfwWindowHint(GLFW_RESIZABLE, false);
+
+  // GLFW 윈도우 생성 및 현재 OpenGL 컨텍스트로 등록
+  GLFWwindow *window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Breakout", nullptr, nullptr);
+  glfwMakeContextCurrent(window);
+
+  // GLAD 를 사용하여 OpenGL 표준 API 호출 시 사용할 현재 그래픽 드라이버에 구현된 함수 포인터 런타임 로드
+  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+  {
+    // 함수 포인터 로드 실패
+    std::cout << "Failed to initialize GLAD" << std::endl;
+    return -1;
+  }
+
+  // GLFW 윈도우 콜백함수 등록
+  glfwSetKeyCallback(window, key_callback);
+  glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+  /** rendering loop */
+  while (!glfwWindowShouldClose(window))
+  {
+    /* code */
+  }
+
+  // GLFW 종료 및 메모리 반납
+  glfwTerminate();
+
   return 0;
 }
 
