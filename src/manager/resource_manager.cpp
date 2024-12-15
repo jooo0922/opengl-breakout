@@ -55,6 +55,90 @@ void ResourceManager::Clear()
   }
 };
 
-Shader ResourceManager::loadShaderFromFile(const char *vShaderFile, const char *fShaderFile, const char *gShaderFile) {};
+Shader ResourceManager::loadShaderFromFile(const char *vShaderFile, const char *fShaderFile, const char *gShaderFile)
+{
+  // 쉐이더 코드를 std::string 타입으로 파싱하여 저장할 변수 선언
+  std::string vertexCode;
+  std::string fragmentCode;
+  std::string geometryCode;
+
+  try
+  {
+    // std::ifstream 생성자 함수를 직접 호출하면 내부에서 std::ifstream::open() 실행을 통해 파일을 연다.
+    std::ifstream vertexShaderFile(vShaderFile);
+    std::ifstream fragmentShaderFile(fShaderFile);
+
+    // std::ifstream 을 통해 읽은 파일 내용을 복사할 std::stringstream 선언
+    std::stringstream vShaderStream, fShaderStream;
+
+    // 스트림 버퍼에 임시 저장된 파일 내용을 std::stringstream 의 메모리 기반 버퍼에 복사 (관련 내용 하단 필기)
+    vShaderStream << vertexShaderFile.rdbuf();
+    fShaderStream << fragmentShaderFile.rdbuf();
+
+    // 파일 스트림 객체 닫기
+    vertexShaderFile.close();
+    fragmentShaderFile.close();
+
+    // std::stringstream 의 메모리 기반 버퍼에 저장된 데이터를 std::string 컨테이너에 복사하여 반환
+    vertexCode = vShaderStream.str();
+    fragmentCode = fShaderStream.str();
+
+    // 지오메트리 쉐이더 파일 경로를 입력받은 경우, 파일 로드 및 std::string 타입으로 파싱
+    if (gShaderFile != nullptr)
+    {
+      std::ifstream geometryShaderFile(gShaderFile);
+      std::stringstream gShaderStream;
+      gShaderStream << geometryShaderFile.rdbuf();
+      geometryShaderFile.close();
+      geometryCode = gShaderStream.str();
+    }
+  }
+  catch (const std::exception &e)
+  {
+    std::cout << "ERROR::SHADER:: Failed to read shader files" << std::endl;
+  }
+
+  // std::string 을 c-style 문자열로 변환
+  const char *vShaderCode = vertexCode.c_str();
+  const char *fShaderCode = fragmentCode.c_str();
+  const char *gShaderCode = geometryCode.c_str();
+
+  // 쉐이더 객체 생성 및 컴파일
+  Shader shader;
+  shader.Compile(vShaderCode, fShaderCode, gShaderFile != nullptr ? gShaderCode : nullptr);
+  return shader;
+};
 
 Texture2D ResourceManager::loadTextureFromFile(const char *file, bool alpha) {};
+
+/**
+ * 스트림 객체와 스트림 버퍼
+ *
+ *
+ * std::ifstream::open() 실행했을 때,
+ * 열린 파일 내용을 '스트림 버퍼(std::filebuf)'에 임시로 저장하게 되는데,
+ * 이 스트림 버퍼의 주소값을 std::ifstream::rdbuf() 를 통해 반환받음.
+ *
+ * std::stringstream << std::filebuf* 로 스트림 버퍼 주소값을 흘려보내면,
+ * std::stringstream 가 관리하는 일반적인 '메모리 기반 버퍼'에
+ * 스트림 버퍼(std::filebuf)의 내용을 복사하여 저장함.
+ *
+ * 이를 통해, 파일 내용을 일반적인 문자열처럼 자유롭게 다룰 수 있도록 함.
+ *
+ * -> 참고로, '스트림 버퍼'란
+ * 스트림 객체가 데이터를 읽고 쓸 때 효율적으로 관리할 수 있도록
+ * 별도로 동적 할당되는 메모리 영역임.
+ *
+ * 스트림 버퍼는 주로 버퍼링된 입출력(I/O 작업)을 최적화하기 위해 존재하는
+ * '중간 버퍼' 이므로, 스트림 객체와 연결되어
+ * 스트림 객체를 통한 데이터 읽기/쓰기를 최적화하는 역할을 수행함.
+ *
+ * 스트림 객체는 데이터를 일정한 단위로 하나씩 순차적으로 읽어들이는 '버퍼링'을 수행함.
+ *
+ * 그러므로, 스트림 객체가 순차적으로 읽어들일 일부 데이터들을
+ * 파일이 저장된 디스크에서 한 번에 가져와서
+ * 임시로 저장하는 공간이 '스트림 버퍼' 라고 보면 됨.
+ *
+ * (디스크 접근으로 인한 오버헤드를 줄이기 위해,
+ * 가급적 많은 양의 데이터를 한 번에 가져와서 임시로 저장해 둠.)
+ */
