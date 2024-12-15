@@ -29,7 +29,7 @@ public:
   static Texture2D GetTexture(std::string name);
 
   // std::map 컨테이너에 저장된 리소스들 메모리 반납
-  void Clear();
+  static void Clear();
 
 private:
   // singleton 클래스는 인스턴스 생성이 불필요하므로, 생성자 함수 캡슐화
