@@ -109,7 +109,30 @@ Shader ResourceManager::loadShaderFromFile(const char *vShaderFile, const char *
   return shader;
 };
 
-Texture2D ResourceManager::loadTextureFromFile(const char *file, bool alpha) {};
+Texture2D ResourceManager::loadTextureFromFile(const char *file, bool alpha)
+{
+  // Texture2D 객체 생성
+  Texture2D texture;
+
+  // alpha 매개변수에 따라 텍스쳐 internal format 변경
+  if (alpha)
+  {
+    texture.Internal_Format = GL_RGBA;
+    texture.Image_Format = GL_RGBA;
+  }
+
+  // stb_image 라이브러리로 이미지 데이터 로드
+  int width, height, nrChannels;
+  unsigned char *data = stbi_load(file, &width, &height, &nrChannels, 0);
+
+  // 텍스쳐 생성 및 이미지 데이터 write
+  texture.Generate(width, height, data);
+
+  // 이미지 데이터 메모리 반납
+  stbi_image_free(data);
+
+  return texture;
+};
 
 /**
  * 스트림 객체와 스트림 버퍼
