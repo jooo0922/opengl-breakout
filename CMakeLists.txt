@@ -54,6 +54,8 @@ add_executable(${TARGET_NAME}
   # current src
   ${SRC_DIR}/game/game.cpp
 
+  ${SRC_DIR}/manager/resource_manager.cpp
+
   ${SRC_DIR}/utils/shader.cpp
   ${SRC_DIR}/utils/texture.cpp
 
