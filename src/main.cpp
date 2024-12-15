@@ -52,6 +52,12 @@ int main()
   glfwSetKeyCallback(window, key_callback);
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+  /** OpenGL 전역 상태 설정 */
+  glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+  // 투명 처리를 위한 blending mode 활성화
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
   /** rendering loop */
   while (!glfwWindowShouldClose(window))
   {
