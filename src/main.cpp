@@ -69,6 +69,12 @@ int main()
     float currentFrame = glfwGetTime();
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
+
+    // 키보드, 마우스 입력 이벤트 발생 검사 후 등록된 콜백함수 호출 + 이벤트 발생에 따른 GLFWwindow 상태 업데이트
+    glfwPollEvents();
+
+    // Back 버퍼에 렌더링된 최종 이미지를 Front 버퍼에 교체 -> blinking 현상 방지
+    glfwSwapBuffers(window);
   }
 
   // GLFW 종료 및 메모리 반납
