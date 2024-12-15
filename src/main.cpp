@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 
 #include "game/game.hpp"
+#include "manager/resource_manager.hpp"
 
 #include <iostream>
 
@@ -92,6 +93,9 @@ int main()
     // Back 버퍼에 렌더링된 최종 이미지를 Front 버퍼에 교체 -> blinking 현상 방지
     glfwSwapBuffers(window);
   }
+
+  // 렌더링 루프 종료 시, ResourceManager 클래스에 저장된 리소스 메모리 반납
+  ResourceManager::Clear();
 
   // GLFW 종료 및 메모리 반납
   glfwTerminate();
