@@ -24,3 +24,36 @@ int main()
 {
   return 0;
 }
+
+/** 콜백함수 구현부 */
+
+// GLFW 윈도우 resizing 콜백함수
+void framebuffer_size_callback(GLFWwindow *window, int width, int height)
+{
+  glViewport(0, 0, width, height);
+}
+
+// GLFW 윈도우 키 입력 콜백함수
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode)
+{
+  // ESC 키 입력 시 렌더링 루프 및 프로그램 종료
+  if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+  {
+    glfwSetWindowShouldClose(window, true);
+  }
+
+  // 나머지 키 입력 시, Game 클래스의 키 입력 플래그 변경
+  if (key >= 0 && key < 1024)
+  {
+    if (action == GLFW_PRESS)
+    {
+      // key press 시, 해당 키 입력 플래그 활성화
+      Breakout.Keys[key] = true;
+    }
+    else if (action == GLFW_RELEASE)
+    {
+      // key release 시, 해당 키 입력 플래그 비활성화
+      Breakout.Keys[key] = false;
+    }
+  }
+}
