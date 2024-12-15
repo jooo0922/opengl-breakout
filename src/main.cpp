@@ -58,10 +58,17 @@ int main()
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+  // delta time 계산을 위한 변수 초기화
+  float deltaTime = 0.0f;
+  float lastFrame = 0.0f;
+
   /** rendering loop */
   while (!glfwWindowShouldClose(window))
   {
-    /* code */
+    // 현재 프레임의 delta time(시간 간격) 계산
+    float currentFrame = glfwGetTime();
+    deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;
   }
 
   // GLFW 종료 및 메모리 반납
