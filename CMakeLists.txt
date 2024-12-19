@@ -56,6 +56,8 @@ add_executable(${TARGET_NAME}
 
   ${SRC_DIR}/manager/resource_manager.cpp
 
+  ${SRC_DIR}/renderer/sprite_renderer.cpp
+
   ${SRC_DIR}/utils/shader.cpp
   ${SRC_DIR}/utils/texture.cpp
 
