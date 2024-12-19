@@ -29,6 +29,9 @@ void SpriteRenderer::DrawSprite(Texture2D &texture, glm::vec2 position, glm::vec
   model = glm::rotate(model, glm::radians(rotate), glm::vec3(0.0f, 0.0f, 1.0f));  // 회전 변환 적용
   model = glm::translate(model, glm::vec3(-0.5f * size.x, -0.5f * size.y, 0.0f)); // pivot 을 2D Sprite 좌상단으로 원복
 
+  // scale 변환 적용
+  model = glm::scale(model, glm::vec3(size, 1.0f));
+
   // 모델행렬 및 색상값 쉐이더로 전송
   this->shader.SetMat4("model", model);
   this->shader.SetVec3("spriteColor", color);
