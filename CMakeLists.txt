@@ -58,6 +58,8 @@ add_executable(${TARGET_NAME}
 
   ${SRC_DIR}/renderer/sprite_renderer.cpp
 
+  ${SRC_DIR}/game_object/game_object.cpp
+
   ${SRC_DIR}/utils/shader.cpp
   ${SRC_DIR}/utils/texture.cpp
 
