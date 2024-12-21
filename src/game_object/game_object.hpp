@@ -23,7 +23,7 @@ public:
   bool IsSolid;   // object 파괴 가능 여부
   bool Destroyed; // object  파괴 여부
 
-  // object 렌더링 시 사용할 2D Sprite
+  // object 를 Sprite 로 렌더링할 때 사용할 텍스쳐 객체
   Texture2D Sprite;
 
   // 생성자 함수들
