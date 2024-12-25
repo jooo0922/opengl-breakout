@@ -4,6 +4,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "../level/game_level.hpp"
+
 // 현재 게임 상태를 enum 으로 정의
 enum GameState
 {
@@ -26,6 +28,9 @@ public:
   GameState State;            // 게임 상태
   bool Keys[1024];            // 키 입력 플래그
   unsigned int Width, Height; // 게임 창 resolution
+
+  std::vector<GameLevel> Levels; // 각 단계별 GameLevel 인스턴스 저장 컨테이너
+  unsigned int Level;            // 현재 게임 level
 
   Game(unsigned int width, unsigned int height);
   ~Game();
