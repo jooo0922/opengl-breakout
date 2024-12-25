@@ -60,6 +60,8 @@ add_executable(${TARGET_NAME}
 
   ${SRC_DIR}/game_object/game_object.cpp
 
+  ${SRC_DIR}/level/game_level.cpp
+
   ${SRC_DIR}/utils/shader.cpp
   ${SRC_DIR}/utils/texture.cpp
 
