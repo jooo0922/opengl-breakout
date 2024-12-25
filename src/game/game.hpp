@@ -14,6 +14,10 @@ enum GameState
   GAME_WIN
 };
 
+// player paddle 크기 및 속도를 전역변수로 정의
+const glm::vec2 PLAYER_SIZE(100.0f, 20.0f);
+const float PLAYER_VELOCITY(500.0f);
+
 /**
  * Game 클래스
  *
