@@ -72,6 +72,40 @@ void Game::Update(float dt)
 
 void Game::ProcessInput(float dt)
 {
+  // 현재 게임 상태가 GAME_ACTIVE 인 경우에만 사용자 입력 처리 수행
+  if (this->State == GAME_ACTIVE)
+  {
+    /**
+     * 프레임 당 player paddle 이동거리 계산
+     *
+     * 클라이언트마다 framerate 이 달라도 일정한 이동 속도를 유지하려면,
+     * '속도 * 매 프레임마다의 delta time(= 시간 간격)' 을 곱해줘야
+     * 임의의 framerate 을 갖는 각 클라이언트에서 현재 프레임에서 이동해야 할 거리값이 나오겠지!
+     *
+     * -> 즉, '거리 = 속력 * 시간' 이라는
+     * 기초적인 물리 공식을 활용한 예시
+     */
+    float velocity = PLAYER_VELOCITY * dt;
+
+    // A 키 입력 시 player paddle 좌측 이동
+    if (this->Keys[GLFW_KEY_A])
+    {
+      // 좌측 이동 시, player paddle 이 화면 왼쪽 모서리를 넘어가지 않도록 x축 위치값(= 2D Sprite 좌상단 정점의 x좌표값) 범위 제한
+      if (Player->Position.x >= 0.0f)
+      {
+        Player->Position.x -= velocity;
+      }
+    }
+    // D 키 입력 시 player paddle 우측 이동
+    if (this->Keys[GLFW_KEY_D])
+    {
+      // 우측 이동 시, player paddle 이 화면 오른쪽 모서리를 넘어가지 않도록 x축 위치값(= 2D Sprite 좌상단 정점의 x좌표값) 범위 제한
+      if (Player->Position.x <= this->Width - Player->Size.x)
+      {
+        Player->Position.x += velocity;
+      }
+    }
+  }
 }
 
 void Game::Render()
