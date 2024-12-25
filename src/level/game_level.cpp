@@ -50,4 +50,63 @@ void GameLevel::Draw(SpriteRenderer &renderer) {};
 
 bool GameLevel::IsCompleted() {};
 
-void GameLevel::init(std::vector<std::vector<unsigned int>> tileData, unsigned int levelWidth, unsigned int levelHeight) {};
+void GameLevel::init(std::vector<std::vector<unsigned int>> tileData, unsigned int levelWidth, unsigned int levelHeight)
+{
+  // tileData 의 행과 열 수를 계산
+  unsigned int rows = tileData.size();
+  unsigned int columns = tileData[0].size();
+
+  // 각 block 의 pixel 단위 크기 계산
+  float unit_width = levelWidth / static_cast<float>(columns);
+  float unit_height = levelHeight / static_cast<float>(rows);
+
+  // tileData 를 순회하며 각 Brick 에 대응되는 GameObject 인스턴스 생성
+  for (unsigned int y = 0; y < rows; ++y)
+  {
+    for (unsigned int x = 0; x < columns; ++x)
+    {
+      if (tileData[y][x] == 1)
+      {
+        /** Brick 타입이 solid 인 경우 */
+        // 현재 tile 의 행과 열을 기반으로 Brick 의 위치(= 2D Sprite 의 좌상단 좌표값) 및 크기 계산
+        glm::vec2 pos(unit_width * x, unit_height * y);
+        glm::vec2 size(unit_width, unit_height);
+
+        // 현재 Brick 에 대응되는 GameObject 인스턴스 생성 및 컨테이너에 추가
+        GameObejct obj(pos, size, ResourceManager::GetTexture("block_solid"), glm::vec3(0.8f, 0.8f, 0.7f));
+        obj.IsSolid = true;
+        this->Bricks.push_back(obj);
+      }
+      else if (tileData[y][x] > 1)
+      {
+        /** Brick 타입이 solid 가 아닌 경우 */
+        // 현재 tile 값에 따라 서로 다른 색상으로 렌더링되도록 색상값 계산
+        glm::vec3 color = glm::vec3(1.0f);
+        if (tileData[y][x] == 2)
+        {
+          color = glm::vec3(0.2f, 0.6f, 1.0f);
+        }
+        else if (tileData[y][x] == 3)
+        {
+          color = glm::vec3(0.0f, 0.7f, 0.0f);
+        }
+        else if (tileData[y][x] == 4)
+        {
+          color = glm::vec3(0.8f, 0.8f, 0.4f);
+        }
+        else if (tileData[y][x] == 5)
+        {
+          color = glm::vec3(1.0f, 0.5f, 0.0f);
+        }
+
+        // 현재 tile 의 행과 열을 기반으로 Brick 의 위치(= 2D Sprite 의 좌상단 좌표값) 및 크기 계산
+        glm::vec2 pos(unit_width * x, unit_height * y);
+        glm::vec2 size(unit_width, unit_height);
+
+        // 현재 Brick 에 대응되는 GameObject 인스턴스 생성 및 컨테이너에 추가
+        this->Bricks.push_back(
+            GameObejct(pos, size, ResourceManager::GetTexture("block"), color));
+      }
+    }
+  }
+};
