@@ -46,9 +46,33 @@ void GameLevel::Load(const char *file, unsigned int levelWidth, unsigned int lev
   }
 };
 
-void GameLevel::Draw(SpriteRenderer &renderer) {};
+void GameLevel::Draw(SpriteRenderer &renderer)
+{
+  // 전달받은 SpriteRenderer 를 통해 Bricks 컨테이너를 순회하며 렌더링
+  for (GameObejct &tile : this->Bricks)
+  {
+    // 아직 파괴되지 않은 Brick 만 렌더링
+    if (!tile.Destroyed)
+    {
+      tile.Draw(renderer);
+    }
+  }
+};
 
-bool GameLevel::IsCompleted() {};
+bool GameLevel::IsCompleted()
+{
+  for (GameObejct &tile : this->Bricks)
+  {
+    // non-solid brick 들 중에서 아직 파괴되지 않고 남아있는 Brick 이 하나라도 있다면 false 를 반환
+    if (!tile.IsSolid && !tile.Destroyed)
+    {
+      return false;
+    }
+  }
+
+  // 파괴될 수 있는 모든 brick 들이 파괴되었다면 true 를 반환
+  return true;
+};
 
 void GameLevel::init(std::vector<std::vector<unsigned int>> tileData, unsigned int levelWidth, unsigned int levelHeight)
 {
