@@ -14,6 +14,7 @@ class GameLevel
 {
 public:
   // game level 을 구성하는 각 Brick 들을 GameObject 클래스 인스턴스로 생성해서 저장할 std::vector 컨테이너
+  // (참고로, 가급적 std::vector 컨테이너에는 인스턴스 자체를 복사하여 추가하는 방식보다는, 스마트 포인터로 주소값을 추가하는 방식이 더 나을 것임.)
   std::vector<GameObejct> Bricks;
 
   GameLevel() {};
