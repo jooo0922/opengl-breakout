@@ -36,6 +36,26 @@ void Game::Init()
 
   // 2D Sprite 에 적용할 텍스쳐 객체 생성
   ResourceManager::LoadTexture("resources/textures/awesomeface.png", true, "face");
+  ResourceManager::LoadTexture("resources/textures/background.jpg", false, "background");
+  ResourceManager::LoadTexture("resources/textures/block.png", false, "block");
+  ResourceManager::LoadTexture("resources/textures/block_solid.png", false, "block_solid");
+
+  // .lvl 파일을 로드하여 각 단계별 GameLevel 인스턴스 생성 및 컨테이너에 추가(= 인스턴스 복사)
+  GameLevel one;
+  GameLevel two;
+  GameLevel three;
+  GameLevel four;
+  one.Load("resources/levels/one.lvl", this->Width, this->Height / 2);
+  two.Load("resources/levels/two.lvl", this->Width, this->Height / 2);
+  three.Load("resources/levels/three.lvl", this->Width, this->Height / 2);
+  four.Load("resources/levels/four.lvl", this->Width, this->Height / 2);
+  this->Levels.push_back(one);
+  this->Levels.push_back(two);
+  this->Levels.push_back(three);
+  this->Levels.push_back(four);
+
+  // 현재 게임 level 을 1단계(one)로 초기화
+  this->Level = 0;
 }
 
 void Game::Update(float dt)
@@ -48,6 +68,14 @@ void Game::ProcessInput(float dt)
 
 void Game::Render()
 {
-  // 2D Sprite 렌더링 테스트
-  Renderer->DrawSprite(ResourceManager::GetTexture("face"), glm::vec2(200.0f, 200.0f), glm::vec2(300.0f, 400.0f), 45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+  // 현재 게임 상태가 GAME_ACTIVE 인 경우에만 렌더링 로직 수행
+  if (this->State == GAME_ACTIVE)
+  {
+    // 배경을 2D Sprite 로 렌더링
+    Renderer->DrawSprite(
+        ResourceManager::GetTexture("background"), glm::vec2(0.0f, 0.0f), glm::vec2(this->Width, this->Height), 0.0f);
+
+    // 현재 게임 level 에 대응되는 GameLevel draw call 호출
+    this->Levels[this->Level].Draw(*Renderer);
+  }
 }
