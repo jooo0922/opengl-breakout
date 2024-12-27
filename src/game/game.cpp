@@ -7,7 +7,7 @@
 /** 게임 관련 상태 변수들 전역 선언(가급적 전역 변수 사용 지양...) */
 SpriteRenderer *Renderer;
 GameObejct *Player;
-GameObejct *Ball;
+BallObject *Ball;
 
 Game::Game(unsigned int width, unsigned int height)
     : State(GAME_ACTIVE), Keys(), Width(width), Height(height)
@@ -75,6 +75,7 @@ void Game::Init()
 
 void Game::Update(float dt)
 {
+  Ball->Move(dt, this->Width);
 }
 
 void Game::ProcessInput(float dt)
@@ -129,5 +130,8 @@ void Game::Render()
 
     // playder paddle draw call 호출
     Player->Draw(*Renderer);
+
+    // ball draw call 호출
+    Ball->Draw(*Renderer);
   }
 }
