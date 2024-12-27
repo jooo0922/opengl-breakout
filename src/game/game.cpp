@@ -2,10 +2,12 @@
 #include "../manager/resource_manager.hpp"
 #include "../renderer/sprite_renderer.hpp"
 #include "../game_object/game_object.hpp"
+#include "../game_object/ball_object.hpp"
 
 /** 게임 관련 상태 변수들 전역 선언(가급적 전역 변수 사용 지양...) */
 SpriteRenderer *Renderer;
 GameObejct *Player;
+GameObejct *Ball;
 
 Game::Game(unsigned int width, unsigned int height)
     : State(GAME_ACTIVE), Keys(), Width(width), Height(height)
@@ -64,6 +66,11 @@ void Game::Init()
   // -> player paddle 객체를 GameObject 인스턴스로 동적 할당 생성
   glm::vec2 playerPos = glm::vec2(this->Width / 2.0f - PLAYER_SIZE.x / 2.0f, this->Height - PLAYER_SIZE.y);
   Player = new GameObejct(playerPos, PLAYER_SIZE, ResourceManager::GetTexture("paddle"));
+
+  // ball 시작 위치가 player paddle 중앙 윗쪽에 오도록 screen space 기준 2D Sprite 좌상단 위치값 계산
+  // -> ball 객체를 BallObject 인스턴스로 동적 할당 생성
+  glm::vec2 ballPos = playerPos + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -BALL_RADIUS * 2.0f);
+  Ball = new BallObject(ballPos, BALL_RADIUS, INITIAL_BALL_VELOCITY, ResourceManager::GetTexture("face"));
 }
 
 void Game::Update(float dt)
