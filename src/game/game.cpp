@@ -102,6 +102,12 @@ void Game::ProcessInput(float dt)
       if (Player->Position.x >= 0.0f)
       {
         Player->Position.x -= velocity;
+
+        // ball 이 player paddle 에 고정되어 있을 경우, player paddle 을 따라가도록 이동
+        if (Ball->Stuck)
+        {
+          Ball->Position.x -= velocity;
+        }
       }
     }
     // D 키 입력 시 player paddle 우측 이동
@@ -111,7 +117,18 @@ void Game::ProcessInput(float dt)
       if (Player->Position.x <= this->Width - Player->Size.x)
       {
         Player->Position.x += velocity;
+
+        // ball 이 player paddle 에 고정되어 있을 경우, player paddle 을 따라가도록 이동
+        if (Ball->Stuck)
+        {
+          Ball->Position.x += velocity;
+        }
       }
+    }
+    // Space 키 입력 시 ball 을 player paddle 에서 분리
+    if (this->Keys[GLFW_KEY_SPACE])
+    {
+      Ball->Stuck = false;
     }
   }
 }
