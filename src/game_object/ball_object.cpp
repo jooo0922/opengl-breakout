@@ -46,4 +46,10 @@ glm::vec2 BallObject::Move(float dt, unsigned int window_width)
   return this->Position;
 };
 
-void BallObject::Reset(glm::vec2 position, glm::vec2 velocity) {};
+void BallObject::Reset(glm::vec2 position, glm::vec2 velocity)
+{
+  // 매개변수로 전달받은 위치값 및 속도값 초기화
+  this->Position = position;
+  this->Velocity = velocity;
+  this->Stuck = true;
+};
