@@ -20,7 +20,10 @@ public:
   BallObject();
   BallObject(glm::vec2 pos, float radius, glm::vec2 velocity, Texture2D sprite);
 
+  // ball 이동 및 bouncing 구현 -> Game::Update() 라이프 사이클에서 호출
   glm::vec2 Move(float dt, unsigned int window_width);
+
+  // 화면을 벗어난 ball 의 위치와 속도 초기화
   void Reset(glm::vec2 position, glm::vec2 velocity);
 };
 
