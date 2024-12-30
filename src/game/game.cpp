@@ -152,3 +152,25 @@ void Game::Render()
     Ball->Draw(*Renderer);
   }
 }
+
+// collision detection 관련 함수 전방선언
+bool checkCollision(GameObejct &one, GameObejct &two);
+
+void Game::DoCollisions() {
+
+};
+
+// AABB - AABB 간 충돌 검사
+bool checkCollision(GameObejct &one, GameObejct &two)
+{
+  // 두 GameObject 의 AABB 간 x축 방향 충돌 검사(= 수평 방향 overlap 검사)
+  bool collisionX = one.Position.x + one.Size.x >= two.Position.x &&
+                    two.Position.x + two.Size.x >= one.Position.x;
+
+  // 두 GameObject 의 AABB 간 y축 방향 충돌 검사(= 수직 방향 overlap 검사)
+  bool collisionY = one.Position.y + one.Size.y >= two.Position.y &&
+                    two.Position.y + two.Size.y >= one.Position.y;
+
+  // x축, y축 방향 모두 충돌 시, 두 AABB 가 충돌한 것으로 판정
+  return collisionX && collisionY;
+};
