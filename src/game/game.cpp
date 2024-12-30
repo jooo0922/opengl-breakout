@@ -76,6 +76,9 @@ void Game::Init()
 void Game::Update(float dt)
 {
   Ball->Move(dt, this->Width);
+
+  // 매 프레임마다 ball 과의 충돌 검사
+  this->DoCollisions();
 }
 
 void Game::ProcessInput(float dt)
