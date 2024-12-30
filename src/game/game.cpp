@@ -156,8 +156,25 @@ void Game::Render()
 // collision detection 관련 함수 전방선언
 bool checkCollision(GameObejct &one, GameObejct &two);
 
-void Game::DoCollisions() {
-
+void Game::DoCollisions()
+{
+  // 현재 Level 의 모든 Brick 들을 순회하면서 Ball 과의 충돌 검사
+  for (GameObejct &box : this->Levels[this->Level].Bricks)
+  {
+    // 아직 파괴되지 않은 Brick 들에 대해서만 충돌 검사
+    if (!box.Destroyed)
+    {
+      if (checkCollision(*Ball, box))
+      {
+        // 현재 Brick 이 non-solid brick 인 경우에만 파괴 상태 업데이트
+        // -> 왜 non-solid brick 도 충돌 검사를 할까? non-solid brick 과 충돌 시 처리할 것도 있으니까!(ex> 이동방향 전환 등)
+        if (!box.IsSolid)
+        {
+          box.Destroyed = true;
+        }
+      }
+    }
+  }
 };
 
 // AABB - AABB 간 충돌 검사
