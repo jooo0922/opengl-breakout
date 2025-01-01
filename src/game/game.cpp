@@ -158,6 +158,7 @@ void Game::Render()
 
 // collision detection 관련 함수 전방선언
 bool checkCollision(GameObejct &one, GameObejct &two);
+bool checkCollision(BallObject &one, GameObejct &two);
 
 void Game::DoCollisions()
 {
@@ -193,4 +194,32 @@ bool checkCollision(GameObejct &one, GameObejct &two)
 
   // x축, y축 방향 모두 충돌 시, 두 AABB 가 충돌한 것으로 판정
   return collisionX && collisionY;
+};
+
+// Circle - AABB 간 충돌 검사 (docs/nodes.md 참고)
+bool checkCollision(BallObject &one, GameObejct &two)
+{
+  // BallObject 의 circle 중점 계산
+  glm::vec2 center(one.Position + one.Radius);
+
+  // 두 번째 GameObject 의 AABB 절반 크기 및 중점 계산 계산
+  glm::vec2 aabb_half_extents(two.Size.x / 2.0f, two.Size.y / 2.0f);
+  glm::vec2 aabb_center(
+      two.Position.x + aabb_half_extents.x,
+      two.Position.y + aabb_half_extents.y);
+
+  // Circle 과 AABB 중점 사이의 vector D 계산
+  glm::vec2 difference = center - aabb_center;
+
+  // [-aabb_half_extents, aabb_half_extents] 범위 내로 vector D clamping
+  glm::vec2 clamped = glm::clamp(difference, -aabb_half_extents, aabb_half_extents);
+
+  // AABB edges 와 clamp 된 vector D 가 교차하는 임의의 점 P 계산 -> circle 중점에서 가장 가까운 점 P
+  glm::vec2 closest = aabb_center + clamped;
+
+  // circle 중점 ~ 가장 가까운 점 P 사이의 거리 계산
+  difference = closest - center;
+
+  // 'circle 중점 ~ 가장 가까운 점 P 사이의 거리' 가 circle 반지름보다 작다면, Circle 과 AABB 가 충돌한 것으로 판정
+  return glm::length(difference) < one.Radius;
 };
