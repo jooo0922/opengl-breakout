@@ -171,11 +171,12 @@ void Game::DoCollisions()
       if (checkCollision(*Ball, box))
       {
         // 현재 Brick 이 non-solid brick 인 경우에만 파괴 상태 업데이트
-        // -> 왜 non-solid brick 도 충돌 검사를 할까? non-solid brick 과 충돌 시 처리할 것도 있으니까!(ex> 이동방향 전환 등)
         if (!box.IsSolid)
         {
           box.Destroyed = true;
         }
+
+        // -> 왜 solid brick 도 충돌 검사를 할까? solid brick 과 충돌 시 처리할 것도 있으니까!(ex> 이동방향 전환 등)
       }
     }
   }
