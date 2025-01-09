@@ -23,6 +23,9 @@ enum Direction
   LEFT
 };
 
+// 충돌 정보를 std::tuple(n개의 데이터쌍) 컨테이너 사용자 정의 타입으로 정의
+typedef std::tuple<bool, Direction, glm::vec2> Collision; // <충돌 여부, 충돌 방향, circle 중점 ~ 가장 가까운 점 P 사이의 거리>
+
 // player paddle 크기 및 속도를 전역변수로 정의
 const glm::vec2 PLAYER_SIZE(100.0f, 20.0f);
 const float PLAYER_VELOCITY(500.0f);
