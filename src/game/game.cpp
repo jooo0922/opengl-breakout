@@ -158,7 +158,7 @@ void Game::Render()
 
 // collision detection 관련 함수 전방선언
 bool checkCollision(GameObejct &one, GameObejct &two);
-bool checkCollision(BallObject &one, GameObejct &two);
+Collision checkCollision(BallObject &one, GameObejct &two);
 Direction VectorDirection(glm::vec2 target);
 
 void Game::DoCollisions()
@@ -169,7 +169,8 @@ void Game::DoCollisions()
     // 아직 파괴되지 않은 Brick 들에 대해서만 충돌 검사
     if (!box.Destroyed)
     {
-      if (checkCollision(*Ball, box))
+      Collision collision = checkCollision(*Ball, box);
+      if (std::get<0>(collision)) // std::get<n>(std::tuple) -> 현재 tuple 데이터쌍에서 n번째 요소를 읽음.
       {
         // 현재 Brick 이 non-solid brick 인 경우에만 파괴 상태 업데이트
         if (!box.IsSolid)
@@ -199,7 +200,7 @@ bool checkCollision(GameObejct &one, GameObejct &two)
 };
 
 // Circle - AABB 간 충돌 검사 (docs/nodes.md 참고)
-bool checkCollision(BallObject &one, GameObejct &two)
+Collision checkCollision(BallObject &one, GameObejct &two)
 {
   // BallObject 의 circle 중점 계산
   glm::vec2 center(one.Position + one.Radius);
@@ -223,7 +224,15 @@ bool checkCollision(BallObject &one, GameObejct &two)
   difference = closest - center;
 
   // 'circle 중점 ~ 가장 가까운 점 P 사이의 거리' 가 circle 반지름보다 작다면, Circle 과 AABB 가 충돌한 것으로 판정
-  return glm::length(difference) < one.Radius;
+  if (glm::length(difference) < one.Radius)
+  {
+    // 더 자세한 충돌 정보를 사용자 정의 타입 Collision 으로 파싱하여 반환
+    return std::make_tuple(true, VectorDirection(difference), difference);
+  }
+  else
+  {
+    return std::make_tuple(false, UP, glm::vec2(0.0f, 0.0f));
+  }
 };
 
 // Circle - AABB 충돌 방향 계산 함수 전방선언
