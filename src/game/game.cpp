@@ -157,6 +157,31 @@ void Game::Render()
   }
 }
 
+void Game::ResetLevel()
+{
+  // 현재 게임 level 에 대응되는 .lvl 파일을 다시 로드하여 GameLevel::Bricks 컨테이너를 초기화함
+  if (this->Level == 0)
+  {
+    this->Levels[0].Load("resources/levels/one.lvl", this->Width, this->Height / 2);
+  }
+  else if (this->Level == 1)
+  {
+    this->Levels[1].Load("resources/levels/two.lvl", this->Width, this->Height / 2);
+  }
+  else if (this->Level == 2)
+  {
+    this->Levels[2].Load("resources/levels/three.lvl", this->Width, this->Height / 2);
+  }
+  else if (this->Level == 3)
+  {
+    this->Levels[3].Load("resources/levels/four.lvl", this->Width, this->Height / 2);
+  }
+};
+
+void Game::ResetPlayer() {
+
+};
+
 // collision detection 관련 함수 전방선언
 bool checkCollision(GameObejct &one, GameObejct &two);
 Collision checkCollision(BallObject &one, GameObejct &two);
