@@ -62,6 +62,10 @@ public:
   void Update(float dt);       // 업데이트 라이프사이클 (플레이어, 공 이동 업데이트 등) -> delta time 전달받음.
   void Render();               // 렌더링 라이프사이클
   void DoCollisions();         // 충돌 감지 함수 -> 업데이트 라이프사이클에서 호출
+
+  /** 게임 리셋 함수 정의 */
+  void ResetLevel();
+  void ResetPlayer();
 };
 
 #endif /* GAME_HPP */
