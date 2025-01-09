@@ -178,8 +178,12 @@ void Game::ResetLevel()
   }
 };
 
-void Game::ResetPlayer() {
-
+void Game::ResetPlayer()
+{
+  // Player 및 Ball 의 멤버변수와 상태값을 모두 초기화함(Game::Init() 함수 참고)
+  Player->Size = PLAYER_SIZE;
+  Player->Position = glm::vec2(this->Width / 2.0f - PLAYER_SIZE.x / 2.0f, this->Height - PLAYER_SIZE.y);
+  Ball->Reset(Player->Position + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -(BALL_RADIUS * 2.0f)), INITIAL_BALL_VELOCITY);
 };
 
 // collision detection 관련 함수 전방선언
