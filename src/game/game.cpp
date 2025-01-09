@@ -1,3 +1,4 @@
+#include <cmath>
 #include "game.hpp"
 #include "../manager/resource_manager.hpp"
 #include "../renderer/sprite_renderer.hpp"
@@ -222,6 +223,30 @@ void Game::DoCollisions()
       }
     }
   }
+
+  // Ball - Player Paddle 충돌 검사
+  Collision result = checkCollision(*Ball, *Player);
+  if (!Ball->Stuck && std::get<0>(result))
+  {
+    /** Ball - Paddle 충돌 처리 */
+    // Ball 충돌 지점이 Paddle 중심에서 떨어진 거리의 비율값(percentage) 계산 -> Paddle 끝부분에 가까울수록 1, 중심에 가까울수록 0
+    float centerBoard = Player->Position.x + Player->Size.x / 2.0f;
+    float distance = (Ball->Position.x + Ball->Radius) - centerBoard;
+    float percentage = distance / (Player->Size.x / 2.0f);
+
+    // 원래 속도 벡터를 복사해 둠.
+    glm::vec2 oldVelocity = Ball->Velocity;
+
+    // Ball 충돌 지점이 Paddle 중심에서 멀수록 x축 속도를 증가시킴
+    float strength = 2.0f;
+    Ball->Velocity.x = INITIAL_BALL_VELOCITY.x * percentage * strength;
+
+    // Paddle 과 충돌할 경우, 수직 이동방향이 항상 위쪽을 향하도록 계산 (수직 이동방향을 뒤집지 않는 이유 하단 필기)
+    Ball->Velocity.y = -1.0f * std::abs(Ball->Velocity.y);
+
+    // 속'력'은 일정하게 유지하도록 속도 벡터의 길이를 원래 속도 벡터와 동일하게 맞춤. -> Ball 충돌 지점에 따라 속도 벡터의 방향만 변경되겠군!
+    Ball->Velocity = glm::normalize(Ball->Velocity) * glm::length(oldVelocity);
+  }
 };
 
 // AABB - AABB 간 충돌 검사
@@ -306,3 +331,29 @@ Direction VectorDirection(glm::vec2 target)
   }
   return (Direction)best_match;
 };
+
+/**
+ * Ball - Player Paddle 충돌 시, 수직 이동방향은 뒤집지 않고 UP 방향으로 고정하는 이유
+ *
+ *
+ * //Ball->Velocity.y = -Ball->Velocity.y;
+ * Ball->Velocity.y = -1.0f * abs(Ball->Velocity.y);
+ *
+ * Ball - Player Paddle 충돌 시 수직 이동방향 변경을 위와 같이 처리한 것을 볼 수 있음.
+ * 이는 LearnOpenGL 본문에서 'sticky paddle' 이라고 불리는 issue 를 해결하기 위한 목적임.
+ *
+ * paddle 이 너무 빠르게 공을 향해 움직이다 보면, 공이 paddle AABB 내부에 들어가는 케이스가 발생함.
+ * 이럴 경우, 공이 AABB 안쪽에 갇혀 있으니 매 프레임마다 충돌 검사 결과가 true 로 감지될 것임.
+ *
+ * 공이 AABB 안에 갇혀서 계속 충돌되면, Ball→Velocity.y 를 계속 뒤집어버리다 보니,
+ * 공이 paddle AABB 를 빨리 벗어나지 못하고 일시적으로 AABB 내부를 맴돌게 됨.
+ * → why? 공의 수직 이동 방향이 위쪽으로 변경되는 게 아니라 위>아래>위>아래>… 이런 식으로 계속 뒤집어지니까!
+ *
+ * 이러한 문제를 해결하기 위해, 공의 paddle 충돌 방향은 항상 UP 으로 가정
+ * (즉, 공이 paddle 에 충돌할 때에는 무조건 top of the paddle 에서만 충돌한다고 가정)함으로써,
+ * 공의 수직 이동 방향 변경 시, 항상 위쪽 방향으로 향하도록
+ * Ball→Velocity.y = -1.0f * abs(Ball→Velocity.y); 와 같이 고정된 방향으로 계산해줘야 함.
+ *
+ * 이렇게 해야 공이 paddle AABB 내부를 맴돌지 않고
+ * 빠르게 위쪽 방향으로 이동방향을 전환해서 벗어날 수 있음.
+ */
