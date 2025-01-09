@@ -159,6 +159,7 @@ void Game::Render()
 // collision detection 관련 함수 전방선언
 bool checkCollision(GameObejct &one, GameObejct &two);
 bool checkCollision(BallObject &one, GameObejct &two);
+Direction VectorDirection(glm::vec2 target);
 
 void Game::DoCollisions()
 {
@@ -223,4 +224,36 @@ bool checkCollision(BallObject &one, GameObejct &two)
 
   // 'circle 중점 ~ 가장 가까운 점 P 사이의 거리' 가 circle 반지름보다 작다면, Circle 과 AABB 가 충돌한 것으로 판정
   return glm::length(difference) < one.Radius;
+};
+
+// Circle - AABB 충돌 방향 계산 함수 전방선언
+Direction VectorDirection(glm::vec2 target)
+{
+  // 충돌 방향벡터 정의
+  glm::vec2 compass[] = {
+      glm::vec2(0.0f, 1.0f),  // up
+      glm::vec2(1.0f, 0.0f),  // right
+      glm::vec2(0.0f, -1.0f), // down
+      glm::vec2(-1.0f, 0.0f)  // left
+  };
+
+  float max = 0.0f;
+  unsigned int best_match = -1;
+
+  /**
+   * 충돌 방향벡터를 순회하며 target 벡터와의 내적값이 가장 큰(= 가장 1에 가까운) 벡터
+   * (= 가장 방향이 비슷한 충돌 방향벡터)를 선택하여 best_match 에 갱신
+   *
+   * -> best_match 에 저장된 index 에 대응되는 Direction 타입으로 casting 후 반환
+   */
+  for (unsigned int i = 0; i < 4; i++)
+  {
+    float dot_product = glm::dot(glm::normalize(target), compass[i]);
+    if (dot_product > max)
+    {
+      max = dot_product;
+      best_match = i;
+    }
+  }
+  return (Direction)best_match;
 };
