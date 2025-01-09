@@ -80,6 +80,13 @@ void Game::Update(float dt)
 
   // 매 프레임마다 ball 과의 충돌 검사
   this->DoCollisions();
+
+  // ball 아래쪽 모서리 충돌 시 game over -> 게임 리셋 처리
+  if (Ball->Position.y >= this->Height)
+  {
+    this->ResetLevel();
+    this->ResetPlayer();
+  }
 }
 
 void Game::ProcessInput(float dt)
