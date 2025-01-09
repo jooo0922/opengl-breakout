@@ -179,6 +179,46 @@ void Game::DoCollisions()
         }
 
         // -> 왜 solid brick 도 충돌 검사를 할까? solid brick 과 충돌 시 처리할 것도 있으니까!(ex> 이동방향 전환 등)
+        Direction dir = std::get<1>(collision);         // 충돌 방향
+        glm::vec2 diff_vector = std::get<2>(collision); // circle 중점 ~ 가장 가까운 점 P 사이의 거리
+
+        // 충돌 방향에 따른 충돌 처리
+        if (dir == LEFT || dir == RIGHT) // 수평 방향 충돌 처리
+        {
+          // 공의 수평 이동방향 뒤집기
+          Ball->Velocity.x = -Ball->Velocity.x;
+
+          // Circle - AABB 충돌 시, 수평 방향으로 AABB 내부로 침투한 거리(level of penetration) 계산
+          float penetration = Ball->Radius - std::abs(diff_vector.x);
+
+          // 충돌 방향에 따라 반대 방향으로 침투 거리만큼 relocate -> 충돌한 공이 AABB 내부에 들어가지 못하도록 위치를 재조정한 것!
+          if (dir == LEFT)
+          {
+            Ball->Position.x += penetration;
+          }
+          else
+          {
+            Ball->Position.x -= penetration;
+          }
+        }
+        else // 수직 방향 충돌 처리
+        {
+          // 공의 수직 이동방향 뒤집기
+          Ball->Velocity.y = -Ball->Velocity.y;
+
+          // Circle - AABB 충돌 시, 수직 방향으로 AABB 내부로 침투한 거리(level of penetration) 계산
+          float penetration = Ball->Radius - std::abs(diff_vector.y);
+
+          // 충돌 방향에 따라 반대 방향으로 침투 거리만큼 relocate -> 충돌한 공이 AABB 내부에 들어가지 못하도록 위치를 재조정한 것!
+          if (dir == UP)
+          {
+            Ball->Position.y -= penetration;
+          }
+          else
+          {
+            Ball->Position.y += penetration;
+          }
+        }
       }
     }
   }
