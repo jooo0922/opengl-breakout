@@ -1,6 +1,7 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
+#include <tuple>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
