@@ -6,6 +6,40 @@ ParticleGenerator::ParticleGenerator(Shader shader, Texture2D texture, unsigned 
   this->init();
 }
 
+void ParticleGenerator::Update(float dt, GameObejct &object, unsigned int newParticles, glm::vec2 offset)
+{
+  // 매 프레임마다 newParticles 개수만큼 particle respawn
+  for (unsigned int i = 0; i < newParticles; i++)
+  {
+    // 가장 먼저 수명이 다해서 대기 상태에 있는 particle 탐색
+    int unusedParticle = this->firstUnusedParticle();
+
+    // 탐색된 대기 상태의 particle 재사용을 위해 오브젝트 풀에서 꺼내 respawn
+    this->respawnParticle(this->particles[unusedParticle], object, offset);
+  }
+
+  // 오브젝트 풀에 저장된 모든 particle 객체들을 순회하며 데이터 업데이트
+  for (unsigned int i = 0; i < this->amount; i++)
+  {
+    /**
+     * 매 프레임마다의 delta time 값만큼 수명 감소
+     *
+     * -> 따라서, 만약 어떤 Particle 의 수명이 1.0f 라면,
+     * 해당 Particle 은 1초 뒤에 수명이 다할 것이고,
+     * 수명에 2.0, 3.0 등 스칼라 곱하면 수명이 2초, 3초와 같이 결정됨.
+     */
+    Particle &p = this->particles[i];
+    p.Life -= dt;
+
+    // 아직 수명이 남아있는 Particle 들의 위치와 색상 업데이트
+    if (p.Life > 0.0f)
+    {
+      p.Position -= p.Velocity * dt; // object 중심을 향해 천천히 이동
+      p.Color.a -= dt * 2.5f;        // alpha 값을 감소시켜 서서히 없어지는 것처럼 보이도록 함.
+    }
+  }
+};
+
 void ParticleGenerator::init()
 {
   /**
