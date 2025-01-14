@@ -143,7 +143,7 @@ unsigned int ParticleGenerator::firstUnusedParticle()
   return 0;
 };
 
-void ParticleGenerator::respawnParticle(Particle &particle, GameObejct &object, glm::vec2 offset = glm::vec2(0.0f, 0.0f))
+void ParticleGenerator::respawnParticle(Particle &particle, GameObejct &object, glm::vec2 offset)
 {
   float random = ((std::rand() % 100) - 50) / 10.0f;    // [-5.0, 4.9] 범위 난수 생성 -> Particle position 랜덤 조정 목적
   float rColor = 0.5f + ((std::rand() % 100) / 100.0f); // [0.5, 1.49] 범위 난수 생성 -> Particle color 랜덤 조정 목적
