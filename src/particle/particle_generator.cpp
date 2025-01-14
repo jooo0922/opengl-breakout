@@ -1,4 +1,5 @@
 #include "particle_generator.hpp"
+#include <cstdlib>
 
 ParticleGenerator::ParticleGenerator(Shader shader, Texture2D texture, unsigned int amount)
     : shader(shader), texture(texture), amount(amount)
@@ -113,6 +114,18 @@ unsigned int ParticleGenerator::firstUnusedParticle()
   // 수명이 다한 particle 을 찾지 못했다면, 첫 번째 particle index 를 반환해서 respawn(정확히는 property override) 하도록 한다.
   lastUsedParticle = 0;
   return 0;
+};
+
+void ParticleGenerator::respawnParticle(Particle &particle, GameObejct &object, glm::vec2 offset = glm::vec2(0.0f, 0.0f))
+{
+  float random = ((std::rand() % 100) - 50) / 10.0f;    // [-5.0, 4.9] 범위 난수 생성 -> Particle position 랜덤 조정 목적
+  float rColor = 0.5f + ((std::rand() % 100) / 100.0f); // [0.5, 1.49] 범위 난수 생성 -> Particle color 랜덤 조정 목적
+
+  /** 대기 상태의 particle 재사용을 위해 property update */
+  particle.Position = object.Position + random + offset;    // ball 위치(object.Position)에서 약간 떨어트린(offset) 뒤, slightly random 하게(random) 재조정
+  particle.Color = glm::vec4(rColor, rColor, rColor, 1.0f); // 각 particle 마다 랜덤한 색상 부여
+  particle.Life = 1.0f;                                     // particle 수명 1초로 초기화
+  particle.Velocity = object.Velocity * 0.1f;               // ball 속도(object.Velocity)와 방향을 맞추되, '속력'은 0.1배로 줄임.
 };
 
 /**
