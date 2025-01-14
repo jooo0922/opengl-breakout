@@ -81,3 +81,56 @@ void ParticleGenerator::init()
     this->particles.push_back(Particle());
   }
 };
+
+unsigned int lastUsedParticle = 0; // ParticleGenerator::firstUnusedParticle() 함수를 통해 가장 최근에 탐색되어 respawn 된 particle index 를 전역변수로 저장
+unsigned int ParticleGenerator::firstUnusedParticle()
+{
+  // 첫 번째 탐색 전략 -> 가장 최근에 탐색된 particle 이후부터 탐색해본다. (탐색 전략 하단 필기 참고)
+  for (unsigned int i = lastUsedParticle; i < this->amount; i++)
+  {
+    if (this->particles[i].Life <= 0.0f)
+    {
+      /**
+       * 오브젝트 풀에서 수명이 다한 particle 을 찾았다면,
+       * 1. 가장 최근에 탐색된 particle index 를 업데이트하고,
+       * 2. 해당 particle index 를 반환한다.
+       */
+      lastUsedParticle = i;
+      return i;
+    }
+  }
+
+  // 두 번째 탐색 전략 -> 첫 번째 탐색에서 못찾았다면, 가장 최근에 탐색된 particle 이전에도 마저 탐색해본다.
+  for (unsigned int i = 0; i < lastUsedParticle; i++)
+  {
+    if (this->particles[i].Life <= 0.0f)
+    {
+      lastUsedParticle = i;
+      return i;
+    }
+  }
+
+  // 수명이 다한 particle 을 찾지 못했다면, 첫 번째 particle index 를 반환해서 respawn(정확히는 property override) 하도록 한다.
+  lastUsedParticle = 0;
+  return 0;
+};
+
+/**
+ * 수명이 다한 particle 탐색 전략
+ *
+ *
+ * ParticleGenerator::firstUnusedParticle() 함수에서는
+ * 기본적으로 linear search(선형 탐색, 순차 탐색) 방식으로 배열의 처음부터 순차적으로 요소를 탐색하는 구조임.
+ *
+ * 탐색 시점에 수명이 다한 particle 이 배열에 여러 개 존재하더라도,
+ * 순차 탐색의 원리 상 '가장 먼저 마주친 죽은 particle' 을 반환하게 되므로,
+ * 다음 번 순차 탐색을 할 때에는 이전에 찾은 죽은 particle index (= lastUsedParticle) 이후에
+ * 나머지 죽은 particle 이 남아있을 가능성이 훨씬 높음.
+ *
+ * 따라서, 첫 번째 탐색 전략은 lastUsedParticle 이후의 particle 들을 우선적으로 탐색해야
+ * 죽은 particle 을 더 빠르게 찾을 수 있을 것임.
+ *
+ * 첫 번째 탐색에서 죽은 particle 을 찾지 못했다면,
+ * lastUsedParticle 이전에 아직 살펴보지 않은 particle 들을 마저 찾아보는 게
+ * 두 번째 탐색 전략!
+ */
