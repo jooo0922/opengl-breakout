@@ -41,6 +41,33 @@ void ParticleGenerator::Update(float dt, GameObejct &object, unsigned int newPar
   }
 };
 
+void ParticleGenerator::Draw()
+{
+  // particle 이 겹칠 때 glowy effect 를 주기 위해 blending function 을 additive blending(가산 혼합)으로 설정
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
+  // particle 렌더링 시 사용할 쉐이더 객체 바인딩
+  this->shader.Use();
+
+  // 오브젝트 풀에 저장된 particle 을 순회하며 렌더링
+  for (Particle particle : this->particles)
+  {
+    // 수명이 남아있는 particle 만 렌더링
+    if (particle.Life > 0.0f)
+    {
+      this->shader.SetVec2("offset", particle.Position);
+      this->shader.SetVec4("color", particle.Color);
+      this->texture.Bind();
+      glBindVertexArray(this->VAO);
+      glDrawArrays(GL_TRIANGLES, 0, 6);
+      glBindVertexArray(0);
+    }
+  }
+
+  // 렌더링 완료 후 blending function 을 default 로 원복
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
 void ParticleGenerator::init()
 {
   /**
