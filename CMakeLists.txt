@@ -66,6 +66,8 @@ add_executable(${TARGET_NAME}
   ${SRC_DIR}/utils/shader.cpp
   ${SRC_DIR}/utils/texture.cpp
 
+  ${SRC_DIR}/particle/particle_generator.cpp
+
   # current main
   ${SRC_DIR}/main.cpp
 )
