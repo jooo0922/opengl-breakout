@@ -91,6 +91,9 @@ void Game::Update(float dt)
   // 매 프레임마다 ball 과의 충돌 검사
   this->DoCollisions();
 
+  // 매 프레임마다 각 particle 재생성 및 업데이트
+  Particles->Update(dt, *Ball, 2, glm::vec2(Ball->Radius / 2.0f));
+
   // ball 아래쪽 모서리 충돌 시 game over -> 게임 리셋 처리
   if (Ball->Position.y >= this->Height)
   {
