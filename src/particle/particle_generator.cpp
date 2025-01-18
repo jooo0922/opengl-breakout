@@ -57,7 +57,11 @@ void ParticleGenerator::Draw()
     {
       this->shader.SetVec2("offset", particle.Position);
       this->shader.SetVec4("color", particle.Color);
+
+      // 0번 texture unit 활성화 및 전달받은 텍스쳐 객체 바인딩
+      glActiveTexture(GL_TEXTURE0);
       this->texture.Bind();
+
       glBindVertexArray(this->VAO);
       glDrawArrays(GL_TRIANGLES, 0, 6);
       glBindVertexArray(0);
