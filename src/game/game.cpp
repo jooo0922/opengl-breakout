@@ -4,11 +4,13 @@
 #include "../renderer/sprite_renderer.hpp"
 #include "../game_object/game_object.hpp"
 #include "../game_object/ball_object.hpp"
+#include "../particle/particle_generator.hpp"
 
 /** 게임 관련 상태 변수들 전역 선언(가급적 전역 변수 사용 지양...) */
 SpriteRenderer *Renderer;
 GameObejct *Player;
 BallObject *Ball;
+ParticleGenerator *Particles;
 
 Game::Game(unsigned int width, unsigned int height)
     : State(GAME_ACTIVE), Keys(), Width(width), Height(height)
@@ -19,12 +21,16 @@ Game::~Game()
 {
   // 동적 할당된 게임 상태 변수(전역 선언)들 메모리 반납
   delete Renderer;
+  delete Player;
+  delete Ball;
+  delete Particles;
 }
 
 void Game::Init()
 {
   // 2D Sprite 쉐이더 객체 생성
   ResourceManager::LoadShader("resources/shaders/sprite.vs", "resources/shaders/sprite.fs", nullptr, "sprite");
+  ResourceManager::LoadShader("resources/shaders/particle.vs", "resources/shaders/particle.fs", nullptr, "particle");
 
   // 2D Sprite 에 적용할 orthogonal projection 행렬 계산
   // 2D Quad 정점 데이터 및 위치를 직관적인 screen space 좌표계로 다루기 위해, screen size 해상도로 left, right, top, bottom 정의
@@ -36,15 +42,19 @@ void Game::Init()
   ResourceManager::GetShader("sprite").Use().SetInt("image", 0);
   ResourceManager::GetShader("sprite").SetMat4("projection", projection);
 
-  // 생성된 2D Sprite 쉐이더 객체를 넘겨줘서 SpriteRenderer 인스턴스 동적 할당 생성
-  Renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
-
   // 2D Sprite 에 적용할 텍스쳐 객체 생성
   ResourceManager::LoadTexture("resources/textures/awesomeface.png", true, "face");
   ResourceManager::LoadTexture("resources/textures/background.jpg", false, "background");
   ResourceManager::LoadTexture("resources/textures/block.png", false, "block");
   ResourceManager::LoadTexture("resources/textures/block_solid.png", false, "block_solid");
   ResourceManager::LoadTexture("resources/textures/paddle.png", true, "paddle");
+  ResourceManager::LoadTexture("resources/textures/particle.png", true, "particle");
+
+  // 생성된 2D Sprite 쉐이더 객체를 넘겨줘서 SpriteRenderer 인스턴스 동적 할당 생성
+  Renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
+
+  // 생성된 Particle 쉐이더 객체를 넘겨줘서 ParticleGenerator 인스턴스 동적 할당 생성
+  Particles = new ParticleGenerator(ResourceManager::GetShader("particle"), ResourceManager::GetTexture("particle"), 500);
 
   // .lvl 파일을 로드하여 각 단계별 GameLevel 인스턴스 생성 및 컨테이너에 추가(= 인스턴스 복사)
   GameLevel one;
