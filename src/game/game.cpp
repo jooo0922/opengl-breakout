@@ -172,6 +172,9 @@ void Game::Render()
     // playder paddle draw call 호출
     Player->Draw(*Renderer);
 
+    // particle draw call 호출 -> particle 은 ball 을 따라다니는 잔상 효과이므로, 다른 오브젝트들보다는 위에 그리지만, ball 을 가리지 않도록 그보다는 먼저 그림
+    Particles->Draw();
+
     // ball draw call 호출
     Ball->Draw(*Renderer);
   }
