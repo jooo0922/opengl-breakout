@@ -41,6 +41,8 @@ void Game::Init()
   // 2D Sprite 쉐이더에 uniform 변수 전송
   ResourceManager::GetShader("sprite").Use().SetInt("image", 0);
   ResourceManager::GetShader("sprite").SetMat4("projection", projection);
+  ResourceManager::GetShader("particle").Use().SetInt("sprite", 0);
+  ResourceManager::GetShader("particle").SetMat4("projection", projection);
 
   // 2D Sprite 에 적용할 텍스쳐 객체 생성
   ResourceManager::LoadTexture("resources/textures/awesomeface.png", true, "face");
