@@ -74,6 +74,14 @@ PostProcessor::PostProcessor(Shader shader, unsigned int width, unsigned int hei
   glUniform1fv(glGetUniformLocation(this->PostProcessingShader.ID, "blur_kernel"), 9, blur_kernel);
 };
 
+void PostProcessor::BeginRender()
+{
+  // scene 요소를 렌더링할 multisampled 프레임버퍼 바인딩 및 초기화
+  glBindFramebuffer(GL_FRAMEBUFFER, this->MSFBO);
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT);
+};
+
 void PostProcessor::initRenderData()
 {
   /**
