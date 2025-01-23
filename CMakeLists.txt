@@ -68,6 +68,8 @@ add_executable(${TARGET_NAME}
 
   ${SRC_DIR}/particle/particle_generator.cpp
 
+  ${SRC_DIR}/postprocess/post_processor.cpp
+
   # current main
   ${SRC_DIR}/main.cpp
 )
