@@ -32,4 +32,43 @@ PostProcessor::PostProcessor(Shader shader, unsigned int width, unsigned int hei
 
   // 프레임버퍼 설정 완료 후 기본 프레임버퍼로 바인딩 초기화
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+  // screen-size 2D Quad 정점 데이터 버퍼(VAO, VBO) 설정
+  this->initRenderData();
+};
+
+void PostProcessor::initRenderData()
+{
+  /**
+   * screen-size 2D Quad 렌더링 시 사용할 VBO, VAO 객체 생성 및 바인딩
+   */
+  // 실제 정점 데이터 바인딩 시, VAO 객체만 바인딩하면 되므로, VBO ID 값은 멤버변수로 들고있지 않아도 됨.
+  unsigned int VBO;
+  // screen quad 는 screen 크기와 같아야 하므로, clip space 좌표계의 최솟값, 최댓값인 -1.0, 1.0 로 정점 좌표값 정의
+  float vertices[] = {
+      // pos        // tex
+      -1.0f, -1.0f, 0.0f, 0.0f,
+      1.0f, 1.0f, 1.0f, 1.0f,
+      -1.0f, 1.0f, 0.0f, 1.0f,
+
+      -1.0f, -1.0f, 0.0f, 0.0f,
+      1.0f, -1.0f, 1.0f, 0.0f,
+      1.0f, 1.0f, 1.0f, 1.0f};
+
+  glGenVertexArrays(1, &this->VAO);
+  glGenBuffers(1, &VBO);
+
+  glBindVertexArray(this->VAO);
+
+  // 2D Quad 정점 데이터를 VBO 객체에 write
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+  // 2D Quad 의 pos, uv 데이터가 vec4 로 묶인 0번 attribute 변수 활성화 및 데이터 해석 방식 정의
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
+
+  // 정점 데이터 설정 완료 후 VBO, VAO 바인딩 해제
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindVertexArray(0);
 };
