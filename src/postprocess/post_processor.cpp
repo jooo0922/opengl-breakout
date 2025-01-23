@@ -35,6 +35,43 @@ PostProcessor::PostProcessor(Shader shader, unsigned int width, unsigned int hei
 
   // screen-size 2D Quad 정점 데이터 버퍼(VAO, VBO) 설정
   this->initRenderData();
+
+  /** post processing 쉐이더에 uniform 변수 전송 */
+  // scene 요소가 렌더링된 텍스쳐를 바인딩할 0번 texture unit 위치값 전송
+  this->PostProcessingShader.SetInt("scene", 0);
+  // 프래그먼트 쉐이더에서 scene 요소가 렌더링된 텍스쳐 샘플링 시, 현재 uv 좌표를 중심으로 주변 uv 좌표 계산을 위한 offset 값 전송
+  // (https://github.com/jooo0922/opengl-study/blob/main/AdvancedOpenGL/Framebuffers/MyShaders/framebuffers_screen_kernel_blur.fs 참고)
+  float offset = 1.0f / 300.0f;
+  float offsets[9][2] = {
+      {-offset, offset},  // top-left
+      {0.0f, offset},     // top-center
+      {offset, offset},   // top-right
+      {-offset, 0.0f},    // center-left
+      {0.0f, 0.0f},       // center-center
+      {offset, 0.0f},     // center - right
+      {-offset, -offset}, // bottom-left
+      {0.0f, -offset},    // bottom-center
+      {offset, -offset}   // bottom-right
+  };
+  glUniform2fv(glGetUniformLocation(this->PostProcessingShader.ID, "offsets"), 9, (float *)offsets);
+  // chaos 효과 적용을 위한 3*3 edge kernel (= convolution matrix) 전송
+  // (https://github.com/jooo0922/opengl-study/blob/main/AdvancedOpenGL/Framebuffers/MyShaders/framebuffers_screen_kernel_edge_detection.fs 참고)
+  int edge_kernel[9] = {
+      // row-major
+      -1, -1, -1, // row1
+      -1, 8, -1,  // row2
+      -1, -1, -1  // row3
+  };
+  glUniform1iv(glGetUniformLocation(this->PostProcessingShader.ID, "edge_kernel"), 9, edge_kernel);
+  // shake 효과 적용을 위한 3*3 blur kernel (= convolution matrix) 전송
+  // (https://github.com/jooo0922/opengl-study/blob/main/AdvancedOpenGL/Framebuffers/MyShaders/framebuffers_screen_kernel_blur.fs 참고)
+  float blur_kernel[9] = {
+      // row-major
+      1.0f / 16.0f, 2.0f / 16.0f, 1.0f / 16.0f, // row1
+      2.0f / 16.0f, 4.0f / 16.0f, 2.0f / 16.0f, // row2
+      1.0f / 16.0f, 2.0f / 16.0f, 1.0f / 16.0f  // row3
+  };
+  glUniform1fv(glGetUniformLocation(this->PostProcessingShader.ID, "blur_kernel"), 9, blur_kernel);
 };
 
 void PostProcessor::initRenderData()
