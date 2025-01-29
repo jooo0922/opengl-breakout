@@ -5,12 +5,14 @@
 #include "../game_object/game_object.hpp"
 #include "../game_object/ball_object.hpp"
 #include "../particle/particle_generator.hpp"
+#include "../postprocess/post_processor.hpp"
 
 /** 게임 관련 상태 변수들 전역 선언(가급적 전역 변수 사용 지양...) */
 SpriteRenderer *Renderer;
 GameObejct *Player;
 BallObject *Ball;
 ParticleGenerator *Particles;
+PostProcessor *Effects;
 
 Game::Game(unsigned int width, unsigned int height)
     : State(GAME_ACTIVE), Keys(), Width(width), Height(height)
@@ -24,6 +26,7 @@ Game::~Game()
   delete Player;
   delete Ball;
   delete Particles;
+  delete Effects;
 }
 
 void Game::Init()
@@ -164,6 +167,9 @@ void Game::Render()
   // 현재 게임 상태가 GAME_ACTIVE 인 경우에만 렌더링 로직 수행
   if (this->State == GAME_ACTIVE)
   {
+    // multisampled 프레임버퍼에 scene 요소 렌더링 직전 처리
+    Effects->BeginRender();
+
     // 배경을 2D Sprite 로 렌더링
     Renderer->DrawSprite(
         ResourceManager::GetTexture("background"), glm::vec2(0.0f, 0.0f), glm::vec2(this->Width, this->Height), 0.0f);
@@ -179,6 +185,12 @@ void Game::Render()
 
     // ball draw call 호출
     Ball->Draw(*Renderer);
+
+    // multisampled 프레임버퍼에 렌더링된 결과를 intermediate 프레임버퍼에 blit 으로 복사
+    Effects->EndRender();
+
+    // intermediate 프레임버퍼 렌더링 결과에 post processing 적용 후 2D Quad 렌더링
+    Effects->Render(glfwGetTime());
   }
 }
 
