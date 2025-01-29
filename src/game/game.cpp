@@ -14,6 +14,9 @@ BallObject *Ball;
 ParticleGenerator *Particles;
 PostProcessor *Effects;
 
+// solid collision 발생 시 reset 되는 shake effect 활성화 지속시간 전역 변수로 선언
+float ShakeTime = 0.0f;
+
 Game::Game(unsigned int width, unsigned int height)
     : State(GAME_ACTIVE), Keys(), Width(width), Height(height)
 {
@@ -243,6 +246,12 @@ void Game::DoCollisions()
         if (!box.IsSolid)
         {
           box.Destroyed = true;
+        }
+        else
+        {
+          // solid block collision 발생 시, shake effect 활성화 및 지속시간 reset
+          ShakeTime = 0.05f;
+          Effects->Shake = true;
         }
 
         // -> 왜 solid brick 도 충돌 검사를 할까? solid brick 과 충돌 시 처리할 것도 있으니까!(ex> 이동방향 전환 등)
