@@ -37,6 +37,8 @@ PostProcessor::PostProcessor(Shader shader, unsigned int width, unsigned int hei
   this->initRenderData();
 
   /** post processing 쉐이더에 uniform 변수 전송 */
+  // uniform 변수 전송할 post processing 쉐이더 바인딩
+  this->PostProcessingShader.Use();
   // scene 요소가 렌더링된 텍스쳐를 바인딩할 0번 texture unit 위치값 전송
   this->PostProcessingShader.SetInt("scene", 0);
   // 프래그먼트 쉐이더에서 scene 요소가 렌더링된 텍스쳐 샘플링 시, 현재 uv 좌표를 중심으로 주변 uv 좌표 계산을 위한 offset 값 전송
