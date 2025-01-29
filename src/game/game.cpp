@@ -106,6 +106,19 @@ void Game::Update(float dt)
   // 매 프레임마다 각 particle 재생성 및 업데이트
   Particles->Update(dt, *Ball, 2, glm::vec2(Ball->Radius / 2.0f));
 
+  // 매 프레임마다 shake 효과 지속시간 업데이트
+  if (ShakeTime > 0.0f)
+  {
+    // solid collision 발생으로 shake 효과 지속시간 reset 되었을 시, 매 프레임마다 지속시간 감소
+    ShakeTime -= dt;
+
+    // 지속시간이 0.0 에 도달했을 경우 shake 효과 비활성화 -> reset 한 지속시간만큼 shake 효과 유지
+    if (ShakeTime <= 0.0f)
+    {
+      Effects->Shake = false;
+    }
+  }
+
   // ball 아래쪽 모서리 충돌 시 game over -> 게임 리셋 처리
   if (Ball->Position.y >= this->Height)
   {
