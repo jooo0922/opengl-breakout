@@ -94,8 +94,23 @@ void PostProcessor::EndRender()
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 };
 
-void PostProcessor::Render(float time) {
-  // intermediate 프레임버퍼에 복사된 렌더링 결과가 저장된 텍스쳐 버퍼를 샘플링하여 post processing 적용 후 2D Quad 렌더링
+void PostProcessor::Render(float time)
+{
+  // post processing 쉐이더 바인딩 및 uniform 변수들 전송
+  this->PostProcessingShader.Use();
+  this->PostProcessingShader.SetFloat("time", time);
+  this->PostProcessingShader.SetInt("confuse", this->Confuse);
+  this->PostProcessingShader.SetInt("chaos", this->Chaos);
+  this->PostProcessingShader.SetInt("shake", this->Shake);
+
+  // scene 요소가 렌더링된 텍스쳐를 0번 texture unit 활성화 후 바인딩
+  glActiveTexture(GL_TEXTURE0);
+  this->Texture.Bind();
+
+  // screen-size 2D Quad 정점 버퍼 객체 바인딩 후 draw call
+  glBindVertexArray(this->VAO);
+  glDrawArrays(GL_TRIANGLES, 0, 6);
+  glBindVertexArray(0);
 };
 
 void PostProcessor::initRenderData()
