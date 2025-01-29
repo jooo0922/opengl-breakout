@@ -37,6 +37,7 @@ void Game::Init()
   // 2D Sprite 쉐이더 객체 생성
   ResourceManager::LoadShader("resources/shaders/sprite.vs", "resources/shaders/sprite.fs", nullptr, "sprite");
   ResourceManager::LoadShader("resources/shaders/particle.vs", "resources/shaders/particle.fs", nullptr, "particle");
+  ResourceManager::LoadShader("resources/shaders/post_processing.vs", "resources/shaders/post_processing.fs", nullptr, "postprocessing");
 
   // 2D Sprite 에 적용할 orthogonal projection 행렬 계산
   // 2D Quad 정점 데이터 및 위치를 직관적인 screen space 좌표계로 다루기 위해, screen size 해상도로 left, right, top, bottom 정의
@@ -63,6 +64,9 @@ void Game::Init()
 
   // 생성된 Particle 쉐이더 객체를 넘겨줘서 ParticleGenerator 인스턴스 동적 할당 생성
   Particles = new ParticleGenerator(ResourceManager::GetShader("particle"), ResourceManager::GetTexture("particle"), 500);
+
+  // 생성된 post processing 쉐이더 객체를 넘겨줘서 PostProcessor 인스턴스 동적 할당 생성
+  Effects = new PostProcessor(ResourceManager::GetShader("postprocessing"), this->Width, this->Height);
 
   // .lvl 파일을 로드하여 각 단계별 GameLevel 인스턴스 생성 및 컨테이너에 추가(= 인스턴스 복사)
   GameLevel one;
