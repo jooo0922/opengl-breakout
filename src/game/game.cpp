@@ -252,13 +252,6 @@ void Game::ResetPlayer()
   Ball->Reset(Player->Position + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -(BALL_RADIUS * 2.0f)), INITIAL_BALL_VELOCITY);
 };
 
-// 각 PowerUp 아이템 생성 확률 계산 함수
-bool ShouldSpawn(unsigned int chance)
-{
-  unsigned int random = std::rand() % chance; // [0, chance] 범위 난수 생성
-  return random == 0;                         // 생성된 난수의 값이 0일 확률 -> 1/chance 확률로 PowerUp 아이템 생성 여부 결정
-}
-
 // 특정 타입의 powerup 활성화 여부 검사 함수 전방선언
 bool IsOtherPowerUpActive(std::vector<PowerUp> &powerUps, std::string type);
 
@@ -324,6 +317,13 @@ void Game::UpdatePowerUps(float dt)
                                       { return powerUp.Destroyed && !powerUp.Activated; }),
                        this->PowerUps.end());
 };
+
+// 각 PowerUp 아이템 생성 확률 계산 함수
+bool ShouldSpawn(unsigned int chance)
+{
+  unsigned int random = std::rand() % chance; // [0, chance] 범위 난수 생성
+  return random == 0;                         // 생성된 난수의 값이 0일 확률 -> 1/chance 확률로 PowerUp 아이템 생성 여부 결정
+}
 
 // PowerUp 랜덤 생성 함수
 void Game::SpawnPowerUps(GameObejct &block)
