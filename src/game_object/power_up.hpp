@@ -18,6 +18,7 @@ const glm::vec2 VELOCITY(0.0f, 150.0f);
  */
 class PowerUp : public GameObejct
 {
+public:
   // powerup 상태 변수
   std::string Type; // powerup 아이템 유형
   float Duration;   // powerup 아이템에 의한 게임 상태 변경 지속시간
