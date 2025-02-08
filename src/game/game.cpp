@@ -58,6 +58,12 @@ void Game::Init()
   ResourceManager::LoadTexture("resources/textures/block_solid.png", false, "block_solid");
   ResourceManager::LoadTexture("resources/textures/paddle.png", true, "paddle");
   ResourceManager::LoadTexture("resources/textures/particle.png", true, "particle");
+  ResourceManager::LoadTexture("resources/textures/powerup_speed.png", true, "powerup_speed");
+  ResourceManager::LoadTexture("resources/textures/powerup_sticky.png", true, "powerup_sticky");
+  ResourceManager::LoadTexture("resources/textures/powerup_increase.png", true, "powerup_increase");
+  ResourceManager::LoadTexture("resources/textures/powerup_confuse.png", true, "powerup_confuse");
+  ResourceManager::LoadTexture("resources/textures/powerup_chaos.png", true, "powerup_chaos");
+  ResourceManager::LoadTexture("resources/textures/powerup_passthrough.png", true, "powerup_passthrough");
 
   // 생성된 2D Sprite 쉐이더 객체를 넘겨줘서 SpriteRenderer 인스턴스 동적 할당 생성
   Renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
