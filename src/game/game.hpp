@@ -66,6 +66,10 @@ public:
   /** 게임 리셋 함수 정의 */
   void ResetLevel();
   void ResetPlayer();
+
+  /** PowerUp 아이템 생성 및 업데이트 함수 정의 */
+  void SpawnPowerUps(GameObejct &block);
+  void UpdatePowerUps(float dt);
 };
 
 #endif /* GAME_HPP */
