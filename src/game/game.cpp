@@ -290,6 +290,49 @@ void Game::SpawnPowerUps(GameObejct &block)
   }
 };
 
+// PowerUp 아이템 습득 시 타입에 따른 게임 상태 변경
+void ActivatePowerUp(PowerUp &powerUp)
+{
+  if (powerUp.Type == "speed")
+  {
+    Ball->Velocity *= 1.2f;
+  }
+  else if (powerUp.Type == "sticky")
+  {
+    Ball->Sticky = true;                         // uber 클래스 내에서 Ball 관련 게임 로직 변경을 위해 상태 변경
+    Player->Color = glm::vec3(1.0f, 0.5f, 1.0f); // 현재 활성화된 effect 를 강조하기 위해 player paddle 색상 변경
+  }
+  else if (powerUp.Type == "pass-through")
+  {
+    Ball->PassThrough = true;                  // uber 클래스 내에서 Ball 관련 게임 로직 변경을 위해 상태 변경
+    Ball->Color = glm::vec3(1.0f, 0.5f, 0.5f); // 현재 활성화된 effect 를 강조하기 위해 ball 색상 변경
+  }
+  else if (powerUp.Type == "pad-size-increase")
+  {
+    Player->Size.x += 50;
+  }
+  else if (powerUp.Type == "confuse")
+  {
+    /**
+     * post_processing.vs 쉐이더에서 분기문에 의해 chaos 와 confuse 효과는 동시 적용 불가
+     * -> 두 효과의 uv 좌표 계산 방법이 서로 충돌하기 때문!
+     *
+     * 따라서, 상대변 effect 가 비활성화되어 있는지 먼저 검사
+     */
+    if (!Effects->Chaos)
+    {
+      Effects->Confuse = true;
+    }
+  }
+  else if (powerUp.Type == "chaos")
+  {
+    if (!Effects->Confuse)
+    {
+      Effects->Chaos = true;
+    }
+  }
+}
+
 // collision detection 관련 함수 전방선언
 bool checkCollision(GameObejct &one, GameObejct &two);
 Collision checkCollision(BallObject &one, GameObejct &two);
@@ -387,6 +430,28 @@ void Game::DoCollisions()
 
     // 속'력'은 일정하게 유지하도록 속도 벡터의 길이를 원래 속도 벡터와 동일하게 맞춤. -> Ball 충돌 지점에 따라 속도 벡터의 방향만 변경되겠군!
     Ball->Velocity = glm::normalize(Ball->Velocity) * glm::length(oldVelocity);
+  }
+
+  // PowerUp - Player Paddle 충돌 검사
+  for (PowerUp &powerUp : this->PowerUps)
+  {
+    // 아직 파괴되지 않은 powerup 들을 순회하며 충돌 검사
+    if (!powerUp.Destroyed)
+    {
+      // 이미 window bottom edge 밑으로 내려간 powerup 은 즉시 파괴
+      if (powerUp.Position.y >= this->Height)
+      {
+        powerUp.Destroyed = true;
+      }
+
+      // player paddle 과 충돌한 powerup 은 효과 활성화 후 파괴
+      if (checkCollision(*Player, powerUp))
+      {
+        ActivatePowerUp(powerUp);
+        powerUp.Destroyed = true;
+        powerUp.Activated = true;
+      }
+    }
   }
 };
 
