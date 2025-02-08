@@ -256,6 +256,13 @@ bool ShouldSpawn(unsigned int chance)
   return random == 0;                         // 생성된 난수의 값이 0일 확률 -> 1/chance 확률로 PowerUp 아이템 생성 여부 결정
 }
 
+// 특정 타입의 powerup 활성화 여부 검사 함수 전방선언
+bool IsOtherPowerUpActive(std::vector<PowerUp> &powerUps, std::string type);
+
+void Game::UpdatePowerUps(float dt) {
+
+};
+
 // PowerUp 랜덤 생성 함수
 void Game::SpawnPowerUps(GameObejct &block)
 {
@@ -331,6 +338,22 @@ void ActivatePowerUp(PowerUp &powerUp)
       Effects->Chaos = true;
     }
   }
+}
+
+bool IsOtherPowerUpActive(std::vector<PowerUp> &powerUps, std::string type)
+{
+  // 현재 활성화된 PowerUp 아이템들을 순회하면서 특정 타입을 탐색
+  for (const PowerUp &powerUp : powerUps)
+  {
+    if (powerUp.Activated)
+    {
+      if (powerUp.Type == type)
+      {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 // collision detection 관련 함수 전방선언
