@@ -6,6 +6,7 @@
 #include <GLFW/glfw3.h>
 
 #include "../level/game_level.hpp"
+#include "../game_object/power_up.hpp"
 
 // 현재 게임 상태를 enum 으로 정의
 enum GameState
@@ -51,6 +52,7 @@ public:
   unsigned int Width, Height; // 게임 창 resolution
 
   std::vector<GameLevel> Levels; // 각 단계별 GameLevel 인스턴스 저장 컨테이너
+  std::vector<PowerUp> PowerUps; // 일정 확률로 생성된 PowerUp 아이템 인스턴스 저장 컨테이너
   unsigned int Level;            // 현재 게임 level
 
   Game(unsigned int width, unsigned int height);
