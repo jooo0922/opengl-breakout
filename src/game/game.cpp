@@ -259,6 +259,14 @@ void Game::ResetPlayer()
   Player->Size = PLAYER_SIZE;
   Player->Position = glm::vec2(this->Width / 2.0f - PLAYER_SIZE.x / 2.0f, this->Height - PLAYER_SIZE.y);
   Ball->Reset(Player->Position + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -(BALL_RADIUS * 2.0f)), INITIAL_BALL_VELOCITY);
+
+  // PowerUp 습득에 의해 변경된 게임 상태 모두 rollback
+  Effects->Chaos = false;
+  Effects->Confuse = false;
+  Ball->PassThrough = false;
+  Ball->Sticky = false;
+  Player->Color = glm::vec3(1.0f);
+  Ball->Color = glm::vec3(1.0f);
 };
 
 // 특정 타입의 powerup 활성화 여부 검사 함수 전방선언
