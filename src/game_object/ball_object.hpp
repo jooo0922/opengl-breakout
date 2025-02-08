@@ -14,8 +14,9 @@ class BallObject : public GameObejct
 {
 public:
   // ball 상태 변수
-  float Radius; // ball 반지름
-  bool Stuck;   // player paddle 에 고정되었는 지 여부
+  float Radius;             // ball 반지름
+  bool Stuck;               // player paddle 에 고정되었는 지 여부
+  bool Sticky, PassThrough; // PowerUp 아이템 습득 시 ball 관련 게임 로직 변경을 위해 추가한 상태 property
 
   BallObject();
   BallObject(glm::vec2 pos, float radius, glm::vec2 velocity, Texture2D sprite);
