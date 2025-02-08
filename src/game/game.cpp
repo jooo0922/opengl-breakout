@@ -367,43 +367,69 @@ void Game::DoCollisions()
         Direction dir = std::get<1>(collision);         // 충돌 방향
         glm::vec2 diff_vector = std::get<2>(collision); // circle 중점 ~ 가장 가까운 점 P 사이의 거리
 
-        // 충돌 방향에 따른 충돌 처리
-        if (dir == LEFT || dir == RIGHT) // 수평 방향 충돌 처리
+        // non-solid block 충돌 시, pass-through 아이템이 활성화되어 있다면 collision resolution(충돌 처리) 무시 -> 충돌한 non-solid block 자리를 뚫고 지나감
+        if (!(Ball->PassThrough && !box.IsSolid))
         {
-          // 공의 수평 이동방향 뒤집기
-          Ball->Velocity.x = -Ball->Velocity.x;
-
-          // Circle - AABB 충돌 시, 수평 방향으로 AABB 내부로 침투한 거리(level of penetration) 계산
-          float penetration = Ball->Radius - std::abs(diff_vector.x);
-
-          // 충돌 방향에 따라 반대 방향으로 침투 거리만큼 relocate -> 충돌한 공이 AABB 내부에 들어가지 못하도록 위치를 재조정한 것!
-          if (dir == LEFT)
+          // 충돌 방향에 따른 충돌 처리
+          if (dir == LEFT || dir == RIGHT) // 수평 방향 충돌 처리
           {
-            Ball->Position.x += penetration;
+            // 공의 수평 이동방향 뒤집기
+            Ball->Velocity.x = -Ball->Velocity.x;
+
+            // Circle - AABB 충돌 시, 수평 방향으로 AABB 내부로 침투한 거리(level of penetration) 계산
+            float penetration = Ball->Radius - std::abs(diff_vector.x);
+
+            // 충돌 방향에 따라 반대 방향으로 침투 거리만큼 relocate -> 충돌한 공이 AABB 내부에 들어가지 못하도록 위치를 재조정한 것!
+            if (dir == LEFT)
+            {
+              Ball->Position.x += penetration;
+            }
+            else
+            {
+              Ball->Position.x -= penetration;
+            }
           }
-          else
+          else // 수직 방향 충돌 처리
           {
-            Ball->Position.x -= penetration;
+            // 공의 수직 이동방향 뒤집기
+            Ball->Velocity.y = -Ball->Velocity.y;
+
+            // Circle - AABB 충돌 시, 수직 방향으로 AABB 내부로 침투한 거리(level of penetration) 계산
+            float penetration = Ball->Radius - std::abs(diff_vector.y);
+
+            // 충돌 방향에 따라 반대 방향으로 침투 거리만큼 relocate -> 충돌한 공이 AABB 내부에 들어가지 못하도록 위치를 재조정한 것!
+            if (dir == UP)
+            {
+              Ball->Position.y -= penetration;
+            }
+            else
+            {
+              Ball->Position.y += penetration;
+            }
           }
         }
-        else // 수직 방향 충돌 처리
-        {
-          // 공의 수직 이동방향 뒤집기
-          Ball->Velocity.y = -Ball->Velocity.y;
+      }
+    }
+  }
 
-          // Circle - AABB 충돌 시, 수직 방향으로 AABB 내부로 침투한 거리(level of penetration) 계산
-          float penetration = Ball->Radius - std::abs(diff_vector.y);
+  // PowerUp - Player Paddle 충돌 검사
+  for (PowerUp &powerUp : this->PowerUps)
+  {
+    // 아직 파괴되지 않은 powerup 들을 순회하며 충돌 검사
+    if (!powerUp.Destroyed)
+    {
+      // 이미 window bottom edge 밑으로 내려간 powerup 은 즉시 파괴
+      if (powerUp.Position.y >= this->Height)
+      {
+        powerUp.Destroyed = true;
+      }
 
-          // 충돌 방향에 따라 반대 방향으로 침투 거리만큼 relocate -> 충돌한 공이 AABB 내부에 들어가지 못하도록 위치를 재조정한 것!
-          if (dir == UP)
-          {
-            Ball->Position.y -= penetration;
-          }
-          else
-          {
-            Ball->Position.y += penetration;
-          }
-        }
+      // player paddle 과 충돌한 powerup 은 효과 활성화 후 파괴
+      if (checkCollision(*Player, powerUp))
+      {
+        ActivatePowerUp(powerUp);
+        powerUp.Destroyed = true;
+        powerUp.Activated = true;
       }
     }
   }
@@ -430,28 +456,9 @@ void Game::DoCollisions()
 
     // 속'력'은 일정하게 유지하도록 속도 벡터의 길이를 원래 속도 벡터와 동일하게 맞춤. -> Ball 충돌 지점에 따라 속도 벡터의 방향만 변경되겠군!
     Ball->Velocity = glm::normalize(Ball->Velocity) * glm::length(oldVelocity);
-  }
 
-  // PowerUp - Player Paddle 충돌 검사
-  for (PowerUp &powerUp : this->PowerUps)
-  {
-    // 아직 파괴되지 않은 powerup 들을 순회하며 충돌 검사
-    if (!powerUp.Destroyed)
-    {
-      // 이미 window bottom edge 밑으로 내려간 powerup 은 즉시 파괴
-      if (powerUp.Position.y >= this->Height)
-      {
-        powerUp.Destroyed = true;
-      }
-
-      // player paddle 과 충돌한 powerup 은 효과 활성화 후 파괴
-      if (checkCollision(*Player, powerUp))
-      {
-        ActivatePowerUp(powerUp);
-        powerUp.Destroyed = true;
-        powerUp.Activated = true;
-      }
-    }
+    // Ball - Paddle 충돌 시, Sticky 아이템 활성화되어 있다면 paddle 에 붙게 됨.
+    Ball->Stuck = Ball->Sticky;
   }
 };
 
