@@ -249,6 +249,47 @@ void Game::ResetPlayer()
   Ball->Reset(Player->Position + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -(BALL_RADIUS * 2.0f)), INITIAL_BALL_VELOCITY);
 };
 
+// 각 PowerUp 아이템 생성 확률 계산 함수
+bool ShouldSpawn(unsigned int chance)
+{
+  unsigned int random = std::rand() % chance; // [0, chance] 범위 난수 생성
+  return random == 0;                         // 생성된 난수의 값이 0일 확률 -> 1/chance 확률로 PowerUp 아이템 생성 여부 결정
+}
+
+// PowerUp 랜덤 생성 함수
+void Game::SpawnPowerUps(GameObejct &block)
+{
+  // positive powerups 는 1/75 확률로 아이템 생성
+  if (ShouldSpawn(75))
+  {
+    // 지속시간 0.0f 으로 전달 시 변경된 게임 상태 영구 적용.
+    this->PowerUps.push_back(PowerUp("speed", glm::vec3(0.5f, 0.5f, 1.0f), 0.0f, block.Position, ResourceManager::GetTexture("powerup_speed")));
+  }
+  if (ShouldSpawn(75))
+  {
+    this->PowerUps.push_back(PowerUp("sticky", glm::vec3(1.0f, 0.5f, 1.0f), 20.0f, block.Position, ResourceManager::GetTexture("powerup_sticky")));
+  }
+  if (ShouldSpawn(75))
+  {
+    this->PowerUps.push_back(PowerUp("pass-through", glm::vec3(0.5f, 1.0f, 0.5f), 10.0f, block.Position, ResourceManager::GetTexture("powerup_passthrough")));
+  }
+  if (ShouldSpawn(75))
+  {
+    // 지속시간 0.0f 으로 전달 시 변경된 게임 상태 영구 적용.
+    this->PowerUps.push_back(PowerUp("pad-size-increase", glm::vec3(1.0f, 0.6f, 0.4f), 0.0f, block.Position, ResourceManager::GetTexture("powerup_increase")));
+  }
+
+  // negative powerups 는 1/15 확률로 아이템 생성 -> 더 자주 생성
+  if (ShouldSpawn(15))
+  {
+    this->PowerUps.push_back(PowerUp("confuse", glm::vec3(1.0f, 0.3f, 0.3f), 15.0f, block.Position, ResourceManager::GetTexture("powerup_confuse")));
+  }
+  if (ShouldSpawn(15))
+  {
+    this->PowerUps.push_back(PowerUp("chaos", glm::vec3(0.9f, 0.25f, 0.25f), 15.0f, block.Position, ResourceManager::GetTexture("powerup_chaos")));
+  }
+};
+
 // collision detection 관련 함수 전방선언
 bool checkCollision(GameObejct &one, GameObejct &two);
 Collision checkCollision(BallObject &one, GameObejct &two);
@@ -269,6 +310,8 @@ void Game::DoCollisions()
         if (!box.IsSolid)
         {
           box.Destroyed = true;
+          // non-solid block 파괴 시, 해당 block 자리에 PowerUp 아이템 랜덤 생성
+          this->SpawnPowerUps(box);
         }
         else
         {
