@@ -112,6 +112,9 @@ void Game::Update(float dt)
   // 매 프레임마다 각 particle 재생성 및 업데이트
   Particles->Update(dt, *Ball, 2, glm::vec2(Ball->Radius / 2.0f));
 
+  // 매 프레임마다 각 powerup 아이템 업데이트
+  this->UpdatePowerUps(dt);
+
   // 매 프레임마다 shake 효과 지속시간 업데이트
   if (ShakeTime > 0.0f)
   {
@@ -259,8 +262,67 @@ bool ShouldSpawn(unsigned int chance)
 // 특정 타입의 powerup 활성화 여부 검사 함수 전방선언
 bool IsOtherPowerUpActive(std::vector<PowerUp> &powerUps, std::string type);
 
-void Game::UpdatePowerUps(float dt) {
+// 매 프레임마다 컨테이너 저장된 PowerUp 아이템 업데이트
+void Game::UpdatePowerUps(float dt)
+{
+  // 생성된 PowerUp 아이템이 저장된 컨테이너 순회
+  for (PowerUp &powerUp : this->PowerUps)
+  {
+    // 생성된 PowerUp 아래로 떨어지도록 위치 업데이트
+    powerUp.Position += powerUp.Velocity * dt;
 
+    // player paddle 과 충돌하여 현재 활성화된 PowerUp 만 순회 -> 활성화 시점에 파괴되어 화면에는 안보이는 상태
+    if (powerUp.Activated)
+    {
+      // effect 지속시간을 계속 감소시킴.
+      powerUp.Duration -= dt;
+
+      // 지속시간이 만료된 PowerUp 이 존재한다면, 변경된 게임 상태를 rollback 해서 비활성화함.
+      if (powerUp.Duration <= 0.0f)
+      {
+        powerUp.Activated = false;
+
+        // PowerUp 타입에 따라 변경된 게임 상태를 rollback 처리 (지속시간이 0.0f(무한대)인 PowerUp 은 생략)
+        if (powerUp.Type == "sticky")
+        {
+          // 해당 타입의 effect 가 활성화되어 있을 때, 동일한 타입의 PowerUp 을 습득했는지 검사
+          // -> 만약 그랬다면 rollback 처리를 생략함. (하단 필기 참고)
+          if (!IsOtherPowerUpActive(this->PowerUps, "sticky"))
+          {
+            Ball->Sticky = false;
+            Player->Color = glm::vec3(1.0f);
+          }
+        }
+        else if (powerUp.Type == "pass-through")
+        {
+          if (!IsOtherPowerUpActive(this->PowerUps, "pass-through"))
+          {
+            Ball->PassThrough = false;
+            Ball->Color = glm::vec3(1.0f);
+          }
+        }
+        else if (powerUp.Type == "confuse")
+        {
+          if (!IsOtherPowerUpActive(this->PowerUps, "confuse"))
+          {
+            Effects->Confuse = false;
+          }
+        }
+        else if (powerUp.Type == "chaos")
+        {
+          if (!IsOtherPowerUpActive(this->PowerUps, "chaos"))
+          {
+            Effects->Chaos = false;
+          }
+        }
+      }
+    }
+  }
+
+  // 컨테이너에 남아있는 powerup 중에서 파괴 처리 및 비활성회된 아이템 제거 (관련 std::vector 문법 필기 참고)
+  this->PowerUps.erase(std::remove_if(this->PowerUps.begin(), this->PowerUps.end(), [](const PowerUp &powerUp)
+                                      { return powerUp.Destroyed && !powerUp.Activated; }),
+                       this->PowerUps.end());
 };
 
 // PowerUp 랜덤 생성 함수
@@ -592,4 +654,38 @@ Direction VectorDirection(glm::vec2 target)
  *
  * 이렇게 해야 공이 paddle AABB 내부를 맴돌지 않고
  * 빠르게 위쪽 방향으로 이동방향을 전환해서 벗어날 수 있음.
+ */
+
+/**
+ * PowerUp effect rollback 시, isOtherPowerUpActive() 검사 이유
+ *
+ *
+ * 어떤 powerup 의 지속시간이 5초일 때, 이 powerup 이 활성화 상태에서 동일한 타입의 powerup(= 지속시간 5초)이
+ * player paddle 과 충돌해서 this→PowerUps 컨테이너에 동일한 타입의 powerup 이 중복 추가되었다면?
+ *
+ * 이런 상황에서 첫 번째 powerup 활성화 시점에 변경된 상태를
+ * 두 번째 동일한 타입의 powerup 의 지속시간만큼 연장시키면 좋을 것임.
+ * -> why? 동일한 powerup 습득 시 effect 지속시간을 그만큼 연장해야 자연스러우니까!
+ *
+ * 따라서, 첫 번째 powerup 의 지속시간이 0초가 되었더라도 변경된 상태를 곧바로 rollback 시키는 게 아니라,
+ * isOtherPowerUpActive() 함수로 this→PowerUps 컨테이너에 아직 지속시간이 남은 동일한 타입의 powerup 이 남아있는지 검사함.
+ *
+ * 남아있는 동일한 타입의 powerup 들이 모두 비활성화될 때까지 기다림으로써
+ * 마지막에 습득한 powerup 의 지속시간만큼 powerup effect 를 연장시킬 수 있게 됨!
+ */
+
+/**
+ * std::vector::erase() 와 std::remove_if() 조합
+ *
+ *
+ * std::remove_if()
+ * -> 특정 조건을 만족하는 powerup 아이템을 컨테이너 뒤로 몰아넣은 후,
+ * 옮겨진 요소들의 첫 번째 반복자를 반환함.
+ *
+ * std::vector::erase(시작 반복자, 끝 반복자)
+ * -> 현재 std::vector 컨테이너 상에서 제거할 부분의
+ * 시작 반복자와 끝 반복자를 전달하면, 해당 부분이 컨테이너로부터 제거됨.
+ *
+ * 위 두 문법의 조합으로 this->PowerUps 컨테이너에 남아있는
+ * PowerUp 인스턴스 제거
  */
