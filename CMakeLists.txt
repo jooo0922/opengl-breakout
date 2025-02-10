@@ -42,6 +42,7 @@ set(CMAKE_DIR "${CMAKE_SOURCE_DIR}/_cmake")
 include(${CMAKE_DIR}/glfw.cmake)
 include(${CMAKE_DIR}/glm.cmake)
 include(${CMAKE_DIR}/stb.cmake)
+include(${CMAKE_DIR}/irrklang.cmake)
 
 # ----------------------------------------------------------------------------
 # files
@@ -85,4 +86,15 @@ target_include_directories(${TARGET_NAME}
 target_link_libraries(${TARGET_NAME}
   PRIVATE
   glfw
+  ${IRRKLANG_LIB}
+)
+
+# ----------------------------------------------------------------------------
+# copy .dll to build directory
+# ----------------------------------------------------------------------------
+add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  ${IRRKLANG_DLL}
+  ${IKPMP3_DLL}
+  $<TARGET_FILE_DIR:${TARGET_NAME}>
 )
