@@ -1,4 +1,5 @@
 #include <cmath>
+#include <irrklang/irrKlang.h>
 #include "game.hpp"
 #include "../manager/resource_manager.hpp"
 #include "../renderer/sprite_renderer.hpp"
@@ -13,6 +14,7 @@ GameObejct *Player;
 BallObject *Ball;
 ParticleGenerator *Particles;
 PostProcessor *Effects;
+irrklang::ISoundEngine *SoundEngine = irrklang::createIrrKlangDevice();
 
 // solid collision 발생 시 reset 되는 shake effect 활성화 지속시간 전역 변수로 선언
 float ShakeTime = 0.0f;
@@ -30,6 +32,7 @@ Game::~Game()
   delete Ball;
   delete Particles;
   delete Effects;
+  SoundEngine->drop();
 }
 
 void Game::Init()
@@ -100,6 +103,9 @@ void Game::Init()
   // -> ball 객체를 BallObject 인스턴스로 동적 할당 생성
   glm::vec2 ballPos = playerPos + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -BALL_RADIUS * 2.0f);
   Ball = new BallObject(ballPos, BALL_RADIUS, INITIAL_BALL_VELOCITY, ResourceManager::GetTexture("face"));
+
+  // irrKlang 라이브러리로 배경음 무한 재생
+  SoundEngine->play2D("resources/audio/breakout.mp3");
 }
 
 void Game::Update(float dt)
@@ -457,12 +463,16 @@ void Game::DoCollisions()
           box.Destroyed = true;
           // non-solid block 파괴 시, 해당 block 자리에 PowerUp 아이템 랜덤 생성
           this->SpawnPowerUps(box);
+          // non-solid block 충돌 시 효과음 재생
+          SoundEngine->play2D("resources/audio/bleep.mp3", false);
         }
         else
         {
           // solid block collision 발생 시, shake effect 활성화 및 지속시간 reset
           ShakeTime = 0.05f;
           Effects->Shake = true;
+          // solid block 충돌 시 효과음 재생
+          SoundEngine->play2D("resources/audio/solid.wav", false);
         }
 
         // -> 왜 solid brick 도 충돌 검사를 할까? solid brick 과 충돌 시 처리할 것도 있으니까!(ex> 이동방향 전환 등)
@@ -532,6 +542,8 @@ void Game::DoCollisions()
         ActivatePowerUp(powerUp);
         powerUp.Destroyed = true;
         powerUp.Activated = true;
+        // powerup 습득 시 효과음 재생
+        SoundEngine->play2D("resources/audio/powerup.wav", false);
       }
     }
   }
@@ -561,6 +573,9 @@ void Game::DoCollisions()
 
     // Ball - Paddle 충돌 시, Sticky 아이템 활성화되어 있다면 paddle 에 붙게 됨.
     Ball->Stuck = Ball->Sticky;
+
+    // ball 충돌 시 효과음 재생
+    SoundEngine->play2D("resources/audio/bleep.wav", false);
   }
 };
 
