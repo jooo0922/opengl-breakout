@@ -30,7 +30,7 @@ class TextRenderer
 {
 public:
   // 각 글꼴별 로드된 glyph metrices 를 파싱하여 std::map 컨테이너에 저장 -> key 값을 기준으로 레드-블랙트리 구조에 정렬하므로, 이진 탐색으로 데이터를 읽음
-  std::map<char, Character> Character;
+  std::map<char, Character> Characters;
 
   // 텍스트 렌더링 시 바인딩할 쉐이더
   Shader TextShader;
