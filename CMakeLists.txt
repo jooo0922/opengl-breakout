@@ -43,6 +43,7 @@ include(${CMAKE_DIR}/glfw.cmake)
 include(${CMAKE_DIR}/glm.cmake)
 include(${CMAKE_DIR}/stb.cmake)
 include(${CMAKE_DIR}/irrklang.cmake)
+include(${CMAKE_DIR}/freetype.cmake)
 
 # ----------------------------------------------------------------------------
 # files
@@ -81,11 +82,13 @@ target_include_directories(${TARGET_NAME}
   ${glfw_INCLUDE}
   ${glm_INCLUDE}
   ${stb_INCLUDE}
+  ${freetype_INCLUDE}
 )
 
 target_link_libraries(${TARGET_NAME}
   PRIVATE
   glfw
+  freetype
   ${IRRKLANG_LIB}
 )
 
