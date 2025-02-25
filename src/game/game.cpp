@@ -150,6 +150,7 @@ void Game::Update(float dt)
     if (this->Lives == 0)
     {
       this->ResetLevel();
+      this->State = GAME_MENU;
     }
     // 화면 밖으로 날아간 공과 player paddle 은 수명이 남아있더라도 reset 해서 다시 게임 진행시킴.
     this->ResetPlayer();
@@ -158,7 +159,7 @@ void Game::Update(float dt)
 
 void Game::ProcessInput(float dt)
 {
-  // 현재 게임 상태가 GAME_ACTIVE 인 경우에만 사용자 입력 처리 수행
+  // 현재 게임 상태가 GAME_ACTIVE 인 경우 사용자 입력 처리
   if (this->State == GAME_ACTIVE)
   {
     /**
@@ -209,12 +210,39 @@ void Game::ProcessInput(float dt)
       Ball->Stuck = false;
     }
   }
+
+  // 현재 게임 상태가 GAME_MENU 인 경우 사용자 입력 처리
+  if (this->State == GAME_MENU)
+  {
+    // Enter 키 입력 시 선택된 Game Level 에서 게임 시작
+    if (this->Keys[GLFW_KEY_ENTER])
+    {
+      this->State = GAME_ACTIVE;
+    }
+    // W 또는 S 키 입력 시 원하는 Game Level 선택하도록 스크롤
+    if (this->Keys[GLFW_KEY_W])
+    {
+      this->Level = (this->Level + 1) % 4; // level 을 0 -> 3 순으로 증가시킴
+    }
+    if (this->Keys[GLFW_KEY_S])
+    {
+      // level 을 3 -> 0 순으로 감소시킴
+      if (this->Level > 0)
+      {
+        --this->Level;
+      }
+      else
+      {
+        this->Level = 3;
+      }
+    }
+  }
 }
 
 void Game::Render()
 {
-  // 현재 게임 상태가 GAME_ACTIVE 인 경우에만 렌더링 로직 수행
-  if (this->State == GAME_ACTIVE)
+  // 모든 게임 상태에서 항상 처리해야 할 렌더링 로직
+  if (this->State == GAME_ACTIVE || this->State == GAME_MENU || this->State == GAME_WIN)
   {
     // multisampled 프레임버퍼에 scene 요소 렌더링 직전 처리
     Effects->BeginRender();
@@ -255,6 +283,13 @@ void Game::Render()
     ss << this->Lives;
     // 버퍼에 저장된 남은 수명값을 std::string 에 복사 후 반환하여 text rendering
     Text->RenderText("Lives:" + ss.str(), 5.0f, 5.0f, 1.0f);
+  }
+
+  // GAME_MENU 상태일 때에만 추가로 처리해야 할 렌더링 로직
+  if (this->State == GAME_MENU)
+  {
+    Text->RenderText("Press ENTER to start", 250.0f, this->Height / 2.0f, 1.0f);
+    Text->RenderText("Press W or S to select level", 245.0f, this->Height / 2.0f + 20.0f, 0.75f);
   }
 }
 
