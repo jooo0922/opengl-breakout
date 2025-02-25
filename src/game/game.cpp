@@ -1,4 +1,5 @@
 #include <cmath>
+#include <sstream>
 #include <irrklang/irrKlang.h>
 #include "game.hpp"
 #include "../manager/resource_manager.hpp"
@@ -22,7 +23,7 @@ TextRenderer *Text;
 float ShakeTime = 0.0f;
 
 Game::Game(unsigned int width, unsigned int height)
-    : State(GAME_ACTIVE), Keys(), Width(width), Height(height)
+    : State(GAME_ACTIVE), Keys(), Width(width), Height(height), Level(0), Lives(3)
 {
 }
 
@@ -144,7 +145,13 @@ void Game::Update(float dt)
   // ball 아래쪽 모서리 충돌 시 game over -> 게임 리셋 처리
   if (Ball->Position.y >= this->Height)
   {
-    this->ResetLevel();
+    // 수명을 계속 감소시키다가 수명이 남아있지 않으면 GAME_MENU(게임 level 선택창) 상태로 전환
+    --this->Lives;
+    if (this->Lives == 0)
+    {
+      this->ResetLevel();
+    }
+    // 화면 밖으로 날아간 공과 player paddle 은 수명이 남아있더라도 reset 해서 다시 게임 진행시킴.
     this->ResetPlayer();
   }
 }
@@ -242,6 +249,12 @@ void Game::Render()
 
     // intermediate 프레임버퍼 렌더링 결과에 post processing 적용 후 2D Quad 렌더링
     Effects->Render(glfwGetTime());
+
+    // std::stringstream 의 메모리 기반 버퍼에 현재 남은 수명값을 복사
+    std::stringstream ss;
+    ss << this->Lives;
+    // 버퍼에 저장된 남은 수명값을 std::string 에 복사 후 반환하여 text rendering
+    Text->RenderText("Lives:" + ss.str(), 5.0f, 5.0f, 1.0f);
   }
 }
 
@@ -264,6 +277,9 @@ void Game::ResetLevel()
   {
     this->Levels[3].Load("resources/levels/four.lvl", this->Width, this->Height / 2);
   }
+
+  // 수명이 남아있지 않을 때 게임 level reset 되므로, 이후 새롭게 시작할 게임을 위해 수명을 다시 채움
+  this->Lives = 3;
 };
 
 void Game::ResetPlayer()
