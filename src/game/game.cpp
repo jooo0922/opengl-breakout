@@ -7,6 +7,7 @@
 #include "../game_object/ball_object.hpp"
 #include "../particle/particle_generator.hpp"
 #include "../postprocess/post_processor.hpp"
+#include "../renderer/text_renderer.hpp"
 
 /** 게임 관련 상태 변수들 전역 선언(가급적 전역 변수 사용 지양...) */
 SpriteRenderer *Renderer;
@@ -15,6 +16,7 @@ BallObject *Ball;
 ParticleGenerator *Particles;
 PostProcessor *Effects;
 irrklang::ISoundEngine *SoundEngine = irrklang::createIrrKlangDevice();
+TextRenderer *Text;
 
 // solid collision 발생 시 reset 되는 shake effect 활성화 지속시간 전역 변수로 선언
 float ShakeTime = 0.0f;
@@ -32,6 +34,7 @@ Game::~Game()
   delete Ball;
   delete Particles;
   delete Effects;
+  delete Text;
   SoundEngine->drop();
 }
 
@@ -76,6 +79,10 @@ void Game::Init()
 
   // 생성된 post processing 쉐이더 객체를 넘겨줘서 PostProcessor 인스턴스 동적 할당 생성
   Effects = new PostProcessor(ResourceManager::GetShader("postprocessing"), this->Width, this->Height);
+
+  // TextRenderer 인스턴스 동적 할당 생성 및 .ttf 파일 로드
+  Text = new TextRenderer(this->Width, this->Height);
+  Text->Load("resources/fonts/OCRAEXT.TTF", 24);
 
   // .lvl 파일을 로드하여 각 단계별 GameLevel 인스턴스 생성 및 컨테이너에 추가(= 인스턴스 복사)
   GameLevel one;
