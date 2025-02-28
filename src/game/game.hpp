@@ -49,6 +49,7 @@ class Game
 public:
   GameState State;            // 게임 상태
   bool Keys[1024];            // 키 입력 플래그
+  bool KeysProcessed[1024];   // 키 입력 처리 여부 플래그
   unsigned int Width, Height; // 게임 창 resolution
 
   std::vector<GameLevel> Levels; // 각 단계별 GameLevel 인스턴스 저장 컨테이너
