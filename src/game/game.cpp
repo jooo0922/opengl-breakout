@@ -251,6 +251,18 @@ void Game::ProcessInput(float dt)
       this->KeysProcessed[GLFW_KEY_S] = true;
     }
   }
+
+  // 현재 게임 상태가 GAME_WIN 인 경우 사용자 입력 처리
+  if (this->State == GAME_WIN)
+  {
+    if (this->Keys[GLFW_KEY_ENTER])
+    {
+      // Enter 키 입력 시 게임을 다시 시작할 수 있도록 GAME_MENU 상태로 변경
+      this->KeysProcessed[GLFW_KEY_ENTER] = true;
+      Effects->Chaos = false;
+      this->State = GAME_MENU;
+    }
+  }
 }
 
 void Game::Render()
