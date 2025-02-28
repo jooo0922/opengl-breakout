@@ -23,7 +23,7 @@ TextRenderer *Text;
 float ShakeTime = 0.0f;
 
 Game::Game(unsigned int width, unsigned int height)
-    : State(GAME_ACTIVE), Keys(), Width(width), Height(height), Level(0), Lives(3)
+    : State(GAME_ACTIVE), Keys(), KeysProcessed(), Width(width), Height(height), Level(0), Lives(3)
 {
 }
 
@@ -214,17 +214,20 @@ void Game::ProcessInput(float dt)
   // 현재 게임 상태가 GAME_MENU 인 경우 사용자 입력 처리
   if (this->State == GAME_MENU)
   {
+    // 키 입력 처리 상태(= this->KeysProcessed)도 확인하여 키 입력 중복 처리 방지
     // Enter 키 입력 시 선택된 Game Level 에서 게임 시작
-    if (this->Keys[GLFW_KEY_ENTER])
+    if (this->Keys[GLFW_KEY_ENTER] && !this->KeysProcessed[GLFW_KEY_ENTER])
     {
       this->State = GAME_ACTIVE;
+      this->KeysProcessed[GLFW_KEY_ENTER] = true;
     }
     // W 또는 S 키 입력 시 원하는 Game Level 선택하도록 스크롤
-    if (this->Keys[GLFW_KEY_W])
+    if (this->Keys[GLFW_KEY_W] && !this->KeysProcessed[GLFW_KEY_W])
     {
       this->Level = (this->Level + 1) % 4; // level 을 0 -> 3 순으로 증가시킴
+      this->KeysProcessed[GLFW_KEY_W] = true;
     }
-    if (this->Keys[GLFW_KEY_S])
+    if (this->Keys[GLFW_KEY_S] && !this->KeysProcessed[GLFW_KEY_S])
     {
       // level 을 3 -> 0 순으로 감소시킴
       if (this->Level > 0)
@@ -235,6 +238,7 @@ void Game::ProcessInput(float dt)
       {
         this->Level = 3;
       }
+      this->KeysProcessed[GLFW_KEY_S] = true;
     }
   }
 }
