@@ -132,6 +132,8 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
     {
       // key release 시, 해당 키 입력 플래그 비활성화
       Breakout.Keys[key] = false;
+      // key release 시, 해당 키 입력 처리 상태도 초기화
+      Breakout.KeysProcessed[key] = false;
     }
   }
 }
