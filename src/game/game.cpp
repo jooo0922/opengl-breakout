@@ -155,6 +155,16 @@ void Game::Update(float dt)
     // 화면 밖으로 날아간 공과 player paddle 은 수명이 남아있더라도 reset 해서 다시 게임 진행시킴.
     this->ResetPlayer();
   }
+
+  // 승리 조건 확인
+  if (this->State == GAME_ACTIVE && this->Levels[this->Level].IsCompleted())
+  {
+    // 게임 진행 상태에서 모든 non-solid block 을 파괴했다면, level 및 player 를 reset 하고, 게임 상태를 GAME_WIN 으로 변경
+    this->ResetLevel();
+    this->ResetPlayer();
+    Effects->Chaos = true;
+    this->State = GAME_WIN;
+  }
 }
 
 void Game::ProcessInput(float dt)
@@ -294,6 +304,13 @@ void Game::Render()
   {
     Text->RenderText("Press ENTER to start", 250.0f, this->Height / 2.0f, 1.0f);
     Text->RenderText("Press W or S to select level", 245.0f, this->Height / 2.0f + 20.0f, 0.75f);
+  }
+
+  // GAME_WIN 상태일 때에만 추가로 처리해야 할 렌더링 로직
+  if (this->State == GAME_WIN)
+  {
+    Text->RenderText("You WON!!", 320.0f, this->Height / 2.0f - 20.0f, 1.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+    Text->RenderText("Press ENTER to retry or ESC to quit", 130.0f, this->Height / 2.0f, 1.0f, glm::vec3(1.0f, 1.0f, 0.0f));
   }
 }
 
